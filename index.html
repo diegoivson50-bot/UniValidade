@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UniValidade</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --azul-royal: #0A42D9;
+    --azul-claro: #4A63E7;
+    --fundo: #F5F7FF;
+    --card: #FFFFFF;
+    --texto: #1A1A2E;
+    --cinza: #8A8FA3;
+    --vermelho: #E53935;
+    --amarelo: #FFB300;
+    --verde: #43A047;
+    --sombra: 0 4px 16px rgba(10, 66, 217, 0.08);
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  body { font-family: 'Inter', sans-serif; background: var(--fundo); color: var(--texto); padding-bottom: 90px; min-height: 100vh; }
+  h1, h2, h3 { font-family: 'Poppins', sans-serif; }
+
+  .tela { display: none; padding: 20px; }
+  .tela.ativa { display: block; }
+
+  .login-wrap { display: flex; flex-direction: column; justify-content: center; min-height: 100vh; padding: 24px; }
+  .logo-container { text-align: center; margin-bottom: 32px; }
+  .logo-container img { width: 100%; max-width: 320px; height: auto; margin: 0 auto 16px; display: block; }
+  .logo-container p { color: var(--cinza); font-size: 14px; margin-top: -8px; }
+
+  .campo { margin-bottom: 16px; }
+  .campo label { display: block; font-size: 13px; font-weight: 600; color: var(--texto); margin-bottom: 6px; }
+  .campo input { width: 100%; padding: 14px 16px; border: 2px solid #E4E8F5; border-radius: 14px; font-size: 15px; font-family: inherit; background: var(--card); transition: .2s; }
+  .campo input:focus { outline: none; border-color: var(--azul-royal); }
+
+  .btn { width: 100%; padding: 16px; border: none; border-radius: 14px; background: linear-gradient(135deg, var(--azul-royal), var(--azul-claro)); color: white; font-size: 16px; font-weight: 600; font-family: inherit; cursor: pointer; transition: .2s; box-shadow: 0 6px 16px rgba(10, 66, 217, .25); }
+  .btn:active { transform: scale(.97); }
+
+  .top-header { display: flex; align-items: center; margin-bottom: 24px; gap: 12px; }
+  .top-header img { height: 40px; width: auto; object-fit: contain; }
+  .header { margin-bottom: 20px; }
+  .header h2 { font-size: 22px; }
+  .header .sub { color: var(--cinza); font-size: 13px; margin-top: 2px; }
+
+  .resumo { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 24px; }
+  .card-resumo { background: var(--card); border-radius: 16px; padding: 14px 8px; text-align: center; box-shadow: var(--sombra); }
+  .card-resumo .num { font-family: 'Poppins'; font-size: 22px; font-weight: 700; }
+  .card-resumo .lbl { font-size: 11px; color: var(--cinza); margin-top: 2px; font-weight: 600;}
+  .card-resumo.bpc .num { color: #8E24AA; }
+  .card-resumo.hc .num { color: #2196F3; }
+  .card-resumo.maio .num { color: #FF9800; }
+  .card-resumo.outros .num { color: #43A047; }
+  .card-resumo.granola .num { color: #E53935; }
+  .card-resumo.food .num { color: #00ACC1; }
+
+  .secao-cat { margin-bottom: 8px; margin-top: 18px; display: flex; align-items: center; gap: 8px; }
+  .secao-cat:first-child { margin-top: 0; }
+  .secao-cat .badge { display: inline-block; font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 8px; }
+  .secao-cat .badge.BPC { background: #F3E5F5; color: #8E24AA; }
+  .secao-cat .badge.HC { background: #E3F2FD; color: #2196F3; }
+  .secao-cat .badge.MAIO { background: #FFF3E0; color: #FF9800; }
+  .secao-cat .badge.OUTROS { background: #E8F5E9; color: #43A047; }
+  .secao-cat .badge.GRANOLA { background: #FFEBEE; color: #E53935; }
+  .secao-cat .badge.FOOD { background: #E0F7FA; color: #00ACC1; }
+  .secao-cat .qtd-sec { font-size: 12px; color: var(--cinza); font-weight: 600; }
+
+  .produto { background: var(--card); border-radius: 18px; padding: 14px; margin-bottom: 12px; box-shadow: var(--sombra); display: flex; gap: 14px; align-items: flex-start; border-left: 5px solid var(--verde); position: relative; }
+  .produto.alerta { border-left-color: var(--amarelo); }
+  .produto.vencido { border-left-color: var(--vermelho); }
+  .produto .info { flex: 1; min-width: 0; padding-right: 24px; }
+  .produto .nome { font-weight: 600; font-size: 15px; margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .produto .qtd-tag { display: inline-block; background: #EEF1FB; color: var(--azul-royal); font-weight: 700; font-size: 12px; padding: 4px 10px; border-radius: 8px; margin-bottom: 6px; border: 1px solid #D0D9F2; }
+  .produto .cat { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 6px; margin-left: 6px; }
+  .cat.BPC { background: #F3E5F5; color: #8E24AA; }
+  .cat.HC { background: #E3F2FD; color: #2196F3; }
+  .cat.MAIO { background: #FFF3E0; color: #FF9800; }
+  .cat.OUTROS { background: #E8F5E9; color: #43A047; }
+  .cat.GRANOLA { background: #FFEBEE; color: #E53935; }
+  .cat.FOOD { background: #E0F7FA; color: #00ACC1; }
+  .produto .dias { font-size: 12px; font-weight: 600; margin-top: 4px;}
+  .produto .dias.ok { color: var(--verde); }
+  .produto .dias.alerta { color: var(--amarelo); }
+  .produto .dias.vencido { color: var(--vermelho); }
+  .produto .data { font-size: 11px; color: var(--cinza); margin-top: 2px; }
+  .produto .del { position: absolute; top: 10px; right: 10px; background: #FFEBEE; border: none; color: var(--vermelho); width: 28px; height: 28px; border-radius: 8px; font-size: 16px; cursor: pointer; }
+  
+  .produto .icone-caixa { width: 48px; height: 48px; border-radius: 12px; background: #EEF1FB; display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; margin-top: 4px; }
+
+  .vazio { text-align: center; padding: 60px 20px; color: var(--cinza); }
+  .vazio .emoji { font-size: 48px; margin-bottom: 12px; }
+
+  .fab { position: fixed; bottom: 90px; right: 20px; width: 60px; height: 60px; border-radius: 20px; border: none; background: linear-gradient(135deg, var(--azul-royal), var(--azul-claro)); color: white; font-size: 30px; cursor: pointer; box-shadow: 0 8px 20px rgba(10, 66, 217, .4); display: none; align-items: center; justify-content: center; z-index: 50; }
+  
+  .nav { position: fixed; bottom: 0; left: 0; right: 0; background: var(--card); display: none; padding: 10px 0 14px; box-shadow: 0 -4px 16px rgba(0,0,0,.05); z-index: 10; }
+  .nav button { flex: 1; background: none; border: none; font-family: inherit; font-size: 11px; color: var(--cinza); cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 2px; }
+  .nav button .icone { font-size: 20px; }
+  .nav button.ativo { color: var(--azul-royal); font-weight: 600; }
+
+  .modal-bg { position: fixed; inset: 0; background: rgba(20,25,50,.5); display: none; align-items: flex-end; z-index: 100; }
+  .modal-bg.aberto { display: flex; }
+  .modal { background: var(--card); width: 100%; border-radius: 24px 24px 0 0; padding: 24px 20px calc(24px + env(safe-area-inset-bottom)); max-height: 90vh; overflow-y: auto; animation: slideUp .3s ease; }
+  @keyframes slideUp { from { transform: translateY(100%); } to { transform: none; } }
+  .modal h3 { font-size: 19px; margin-bottom: 18px; display: flex; justify-content: space-between; align-items: center; }
+  .modal .fechar { background: #F0F2FA; border: none; width: 32px; height: 32px; border-radius: 10px; font-size: 18px; cursor: pointer; }
+
+  .grupo-cats { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 16px; }
+  .cat-btn { padding: 12px 6px; border: 2px solid #E4E8F5; background: var(--card); border-radius: 12px; font-family: inherit; font-size: 12px; font-weight: 600; cursor: pointer; }
+  .cat-btn.sel { border-color: var(--azul-royal); background: #EEF1FF; color: var(--azul-royal); }
+
+  .qtd-container { display: flex; align-items: center; background: #FAFBFF; border: 2px solid #E4E8F5; border-radius: 14px; overflow: hidden; height: 50px;}
+  .qtd-btn { width: 50px; height: 100%; border: none; background: #EEF1FF; color: var(--azul-royal); font-size: 24px; font-weight: 600; cursor: pointer; }
+  .qtd-input { flex: 1; text-align: center; border: none; background: transparent; font-size: 18px; font-weight: 700; font-family: 'Poppins', sans-serif; -moz-appearance: textfield;}
+  .qtd-input:focus { outline: none; }
+
+  .toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%) translateY(-100px); background: var(--verde); color: white; padding: 12px 20px; border-radius: 12px; font-size: 14px; font-weight: 600; z-index: 200; transition: .3s; }
+  .toast.show { transform: translateX(-50%) translateY(0); }
+</style>
+</head>
+<body>
+
+<div id="telaLogin" class="tela ativa">
+  <div class="login-wrap">
+    <div class="logo-container">
+      <img src="logo.png" alt="UniValidade" onerror="this.style.display='none'">
+      <h1 style="color:var(--azul-royal); font-size:32px; margin-bottom:16px;">UniValidade</h1>
+      <p>Controle de validade dos produtos</p>
+    </div>
+    <div class="campo"><label>Nome do Promotor</label><input id="inNome" placeholder="Ex: João Silva"></div>
+    <div class="campo"><label>Loja</label><input id="inLoja" placeholder="Ex: Supermercado Bom Preço"></div>
+    <div class="campo"><label>Cidade</label><input id="inCidade" placeholder="Ex: São Paulo"></div>
+    <button class="btn" onclick="entrar()">Entrar no Sistema →</button>
+  </div>
+</div>
+
+<div id="telaDash" class="tela">
+  <div class="top-header">
+    <img src="logo.png" alt="UniValidade" onerror="this.style.display='none'">
+    <h2 style="color:var(--azul-royal);">UniValidade</h2>
+  </div>
+
+  <div class="header">
+    <h2>Olá, <span id="saudNome">Promotor</span> 👋</h2>
+    <p class="sub" id="saudLoja">—</p>
+  </div>
+
+  <div class="resumo">
+    <div class="card-resumo bpc"><div class="num" id="countBPC">0</div><div class="lbl">BPC</div></div>
+    <div class="card-resumo hc"><div class="num" id="countHC">0</div><div class="lbl">HC</div></div>
+    <div class="card-resumo maio"><div class="num" id="countMAIO">0</div><div class="lbl">Maionese</div></div>
+    <div class="card-resumo outros"><div class="num" id="countOUTROS">0</div><div class="lbl">Outros Molhos</div></div>
+    <div class="card-resumo granola"><div class="num" id="countGRANOLA">0</div><div class="lbl">Granola</div></div>
+    <div class="card-resumo food"><div class="num" id="countFOOD">0</div><div class="lbl">Food Sol.</div></div>
+  </div>
+
+  <div class="header" style="margin-bottom:12px"><h2 style="font-size:17px">Produtos cadastrados</h2></div>
+  <div id="listaProdutos"></div>
+</div>
+
+<button class="fab" id="fab" onclick="abrirModal()" style="display:none">+</button>
+
+<div class="nav" id="nav" style="display:none">
+  <button class="ativo"><span class="icone">🏠</span> Início</button>
+  <button onclick="sair()"><span class="icone">🚪</span> Sair</button>
+</div>
+
+<div class="modal-bg" id="modalBg">
+  <div class="modal">
+    <h3>Novo Produto <button class="fechar" onclick="fecharModal()">✕</button></h3>
+
+    <div class="campo"><label>Nome do Produto</label><input id="inProduto" placeholder="Ex: Maionese Hellmann's"></div>
+    <div class="campo"><label>Marca</label><input id="inMarca" placeholder="Ex: Hellmann's"></div>
+
+    <div class="campo">
+      <label>Categoria</label>
+      <div class="grupo-cats">
+        <button type="button" class="cat-btn" data-cat="BPC" onclick="selCat(this)">BPC</button>
+        <button type="button" class="cat-btn" data-cat="HC" onclick="selCat(this)">HC</button>
+        <button type="button" class="cat-btn" data-cat="MAIO" onclick="selCat(this)">Maionese</button>
+        <button type="button" class="cat-btn" data-cat="OUTROS" onclick="selCat(this)">Outros Molhos</button>
+        <button type="button" class="cat-btn" data-cat="GRANOLA" onclick="selCat(this)">Granola</button>
+        <button type="button" class="cat-btn" data-cat="FOOD" onclick="selCat(this)">Food Solution</button>
+      </div>
+    </div>
+
+    <div class="campo">
+      <label>Quantidade em Estoque</label>
+      <div class="qtd-container">
+        <button type="button" class="qtd-btn" onclick="mudarQtd(-1)">−</button>
+        <input type="number" id="inQtd" class="qtd-input" value="1" min="1">
+        <button type="button" class="qtd-btn" onclick="mudarQtd(1)">+</button>
+      </div>
+    </div>
+
+    <div class="campo">
+      <label>Data de Validade</label>
+      <input type="date" id="inValidade">
+    </div>
+
+    <button class="btn" onclick="salvarProduto()" style="margin-top: 10px;">💾 Salvar Produto</button>
+  </div>
+</div>
+
+<div class="toast" id="toast">✓ Produto salvo!</div>
+
+<script>
+var promotor = null;
+var produtos = [];
+var categoriaSelecionada = null;
+
+var DIAS_LIMITE_CRITICO = 15;
+var DIAS_LIMITE_ATENCAO = 30;
+
+var CATEGORIAS_ORDEM = ['BPC', 'HC', 'MAIO', 'OUTROS', 'GRANOLA', 'FOOD'];
+var NOMES_CAT = { BPC: 'BPC', HC: 'HC', MAIO: 'Maionese', OUTROS: 'Outros Molhos', GRANOLA: 'Granola', FOOD: 'Food Solution' };
+
+try {
+  var pSalvo = localStorage.getItem('univalidade_promotor');
+  if (pSalvo) promotor = JSON.parse(pSalvo);
+  
+  var prodSalvos = localStorage.getItem('univalidade_produtos');
+  if (prodSalvos) produtos = JSON.parse(prodSalvos);
+} catch(e) {}
+
+window.onload = function() {
+  if (promotor) {
+    document.getElementById('inNome').value = promotor.nome;
+    document.getElementById('inLoja').value = promotor.loja;
+    document.getElementById('inCidade').value = promotor.cidade;
+    entrar();
+  }
+};
+
+function entrar() {
+  var nome = document.getElementById('inNome').value.trim();
+  var loja = document.getElementById('inLoja').value.trim();
+  var cidade = document.getElementById('inCidade').value.trim();
+  
+  if (!nome || !loja || !cidade) { 
+    alert('Preencha todos os campos!'); 
+    return; 
+  }
+
+  promotor = { nome: nome, loja: loja, cidade: cidade };
+  localStorage.setItem('univalidade_promotor', JSON.stringify(promotor));
+  
+  document.getElementById('saudNome').textContent = nome.split(' ')[0];
+  document.getElementById('saudLoja').textContent = loja + ' • ' + cidade;
+  
+  document.getElementById('telaLogin').classList.remove('ativa');
+  document.getElementById('telaDash').classList.add('ativa');
+  document.getElementById('fab').style.display = 'flex';
+  document.getElementById('nav').style.display = 'flex';
+  
+  renderizar();
+}
+
+function sair() { 
+  localStorage.removeItem('univalidade_promotor'); 
+  location.reload(); 
+}
+
+function abrirModal() {
+  document.getElementById('modalBg').classList.add('aberto');
+  document.getElementById('inProduto').value = '';
+  document.getElementById('inMarca').value = '';
+  document.getElementById('inValidade').value = '';
+  document.getElementById('inQtd').value = '1';
+  
+  document.querySelectorAll('.cat-btn').forEach(function(b) { b.classList.remove('sel'); });
+  categoriaSelecionada = null;
+}
+
+function fecharModal() { document.getElementById('modalBg').classList.remove('aberto'); }
+
+function selCat(btn) {
+  document.querySelectorAll('.cat-btn').forEach(function(b) { b.classList.remove('sel'); });
+  btn.classList.add('sel');
+  categoriaSelecionada = btn.dataset.cat;
+}
+
+function mudarQtd(valor) {
+  var input = document.getElementById('inQtd');
+  var atual = parseInt(input.value) || 1;
+  atual += valor;
+  if (atual < 1) atual = 1;
+  input.value = atual;
+}
+
+function salvarProduto() {
+  var nome = document.getElementById('inProduto').value.trim();
+  var marca = document.getElementById('inMarca').value.trim();
+  var qtd = document.getElementById('inQtd').value;
+  var validade = document.getElementById('inValidade').value;
+
+  if (!nome || !validade || !categoriaSelecionada || !qtd) {
+    alert('Preencha nome, categoria, qtd e validade');
+    return;
+  }
+
+  var novo = {
+    id: Date.now().toString(),
+    nome: nome, 
+    marca: marca,
+    categoria: categoriaSelecionada,
+    quantidade: parseInt(qtd),
+    validade: validade,
+    promotor: promotor.nome,
+    loja: promotor.loja,
+    cidade: promotor.cidade
+  };
+
+  produtos.push(novo);
+  localStorage.setItem('univalidade_produtos', JSON.stringify(produtos));
+  
+  fecharModal();
+  mostrarToast('✓ Produto cadastrado!');
+  renderizar();
+}
+
+function calcularDias(validade) {
+  var hoje = new Date(); 
+  hoje.setHours(0,0,0,0);
+  var alvo = new Date(validade + 'T00:00:00');
+  return Math.ceil((alvo - hoje) / (1000 * 60 * 60 * 24));
+}
+
+function classificarStatus(dias) {
+  if (dias <= DIAS_LIMITE_CRITICO) return 'vencido';
+  if (dias <= DIAS_LIMITE_ATENCAO) return 'alerta';
+  return 'ok';
+}
+
+function textoDias(dias) {
+  if (dias < 0) return '🚨 Vencido há ' + Math.abs(dias) + ' dia(s)';
+  if (dias === 0) return '🚨 Vence hoje!';
+  if (dias <= DIAS_LIMITE_CRITICO) return '🚨 Faltam ' + dias + ' dia(s)';
+  if (dias <= DIAS_LIMITE_ATENCAO) return '⚠️ Faltam ' + dias + ' dias';
+  return '✓ Faltam ' + dias + ' dias';
+}
+
+function htmlCard(p) {
+  var dias = calcularDias(p.validade);
+  var cls = classificarStatus(dias);
+  var alvo = new Date(p.validade + 'T00:00:00');
+  var dataFmt = alvo.toLocaleDateString('pt-BR');
+  var nomeExibicao = NOMES_CAT[p.categoria] || p.categoria;
+  
+  return '<div class="produto ' + cls + '">' +
+    '<div class="icone-caixa">📦</div>' +
+    '<div class="info">' +
+      '<div class="nome">' + p.nome + '</div>' +
+      '<div><span class="qtd-tag">📦 ' + p.quantidade + ' un</span><span class="cat ' + p.categoria + '">' + nomeExibicao + '</span></div>' +
+      '<div class="dias ' + cls + '">' + textoDias(dias) + '</div>' +
+      '<div class="data">Validade: ' + dataFmt + '</div>' +
+    '</div>' +
+    '<button class="del" onclick="excluir(\'' + p.id + '\')">✕</button>' +
+  '</div>';
+}
+
+function renderizar() {
+  var lista = document.getElementById('listaProdutos');
+  if (!promotor) return;
+
+  var meus = produtos.filter(function(p) { return p.promotor === promotor.nome; });
+
+  document.getElementById('countBPC').textContent = meus.filter(function(p) { return p.categoria === 'BPC'; }).length;
+  document.getElementById('countHC').textContent = meus.filter(function(p) { return p.categoria === 'HC'; }).length;
+  document.getElementById('countMAIO').textContent = meus.filter(function(p) { return p.categoria === 'MAIO'; }).length;
+  document.getElementById('countOUTROS').textContent = meus.filter(function(p) { return p.categoria === 'OUTROS'; }).length;
+  document.getElementById('countGRANOLA').textContent = meus.filter(function(p) { return p.categoria === 'GRANOLA'; }).length;
+  document.getElementById('countFOOD').textContent = meus.filter(function(p) { return p.categoria === 'FOOD'; }).length;
+
+  if (meus.length === 0) {
+    lista.innerHTML = '<div class="vazio"><div class="emoji">📦</div><p>Nenhum produto cadastrado ainda.</p><p style="font-size:13px;margin-top:6px">Toque no botão <b>+</b> para começar</p></div>';
+    return;
+  }
+
+  // AGRUPAMENTO POR CATEGORIA
+  var html = '';
+  CATEGORIAS_ORDEM.forEach(function(cat) {
+    var itens = meus.filter(function(p) { return p.categoria === cat; });
+    if (itens.length === 0) return; // categoria vazia não aparece
+
+    itens.sort(function(a, b) { return new Date(a.validade) - new Date(b.validade); });
+
+    html += '<div class="secao-cat">' +
+      '<span class="badge ' + cat + '">' + NOMES_CAT[cat] + '</span>' +
+      '<span class="qtd-sec">' + itens.length + ' produto' + (itens.length > 1 ? 's' : '') + '</span>' +
+    '</div>';
+    html += itens.map(htmlCard).join('');
+  });
+
+  lista.innerHTML = html;
+}
+
+function excluir(id) {
+  if (!confirm('Excluir este produto?')) return;
+  produtos = produtos.filter(function(p) { return String(p.id) !== String(id); });
+  localStorage.setItem('univalidade_produtos', JSON.stringify(produtos));
+  renderizar();
+  mostrarToast('Produto removido');
+}
+
+function mostrarToast(msg, cor) {
+  if (!cor) cor = '#43A047';
+  var t = document.getElementById('toast');
+  t.textContent = msg; t.style.background = cor;
+  t.classList.add('show');
+  setTimeout(function() { t.classList.remove('show'); }, 2500);
+}
+</script>
+</body>
+</html>
