@@ -1,544 +1,475 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Univalidade</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UniValidade</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-  * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; }
-  body { background: #f3f4f6; color: #111827; min-height: 100vh; }
-  .hidden { display: none !important; }
-
-  header {
-    background: #1d4ed8; color: #fff; padding: 12px 16px;
-    display: flex; justify-content: space-between; align-items: center;
-    flex-wrap: wrap; gap: 8px;
+  :root {
+    --azul: #1F36C7;
+    --azul-claro: #4A63E7;
+    --fundo: #F5F7FF;
+    --card: #FFFFFF;
+    --texto: #1A1A2E;
+    --cinza: #8A8FA3;
+    --vermelho: #E53935;
+    --amarelo: #FFB300;
+    --verde: #43A047;
+    --sombra: 0 4px 16px rgba(31,54,199,0.08);
   }
-  header h1 { font-size: 18px; }
-  header nav { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; font-size: 14px; }
-  header nav a, header nav button {
-    color: #fff; background: none; border: none; cursor: pointer;
-    text-decoration: none; font-size: 14px;
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--fundo);
+    color: var(--texto);
+    padding-bottom: 90px;
+    min-height: 100vh;
   }
-  header nav a:hover, header nav button:hover { text-decoration: underline; }
-  .btn-novo { background: #fff; color: #1d4ed8; padding: 6px 12px; border-radius: 8px; font-weight: 600; text-decoration: none; }
-  .btn-novo:hover { background: #dbeafe; text-decoration: none; }
+  h1, h2, h3 { font-family: 'Poppins', sans-serif; }
 
-  main { max-width: 960px; margin: 0 auto; padding: 16px; }
-  h2 { font-size: 22px; margin-bottom: 4px; }
-  .sub { color: #6b7280; font-size: 14px; margin-bottom: 16px; }
+  /* ---------- TELAS ---------- */
+  .tela { display: none; padding: 20px; }
+  .tela.ativa { display: block; animation: fade .3s ease; }
+  @keyframes fade { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
 
-  .card { background: #fff; border-radius: 12px; padding: 16px; border: 1px solid #e5e7eb; margin-bottom: 16px; }
-  .grid-cards { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 16px; }
-  @media (min-width: 700px) { .grid-cards { grid-template-columns: repeat(4, 1fr); } }
-
-  .stat { padding: 16px; border-radius: 12px; border: 1px solid; }
-  .stat p:first-child { font-size: 12px; color: #4b5563; }
-  .stat p:last-child { font-size: 24px; font-weight: 700; }
-  .stat.total { background: #eff6ff; border-color: #bfdbfe; }
-  .stat.vencido { background: #fef2f2; border-color: #fecaca; }
-  .stat.critico { background: #fff7ed; border-color: #fed7aa; }
-  .stat.atencao { background: #fefce8; border-color: #fef08a; }
-
-  input, select, textarea {
-    width: 100%; padding: 10px 12px; border: 1px solid #d1d5db;
-    border-radius: 8px; font-size: 14px; outline: none; background: #fff;
+  /* ---------- LOGIN ---------- */
+  .login-wrap {
+    display: flex; flex-direction: column; justify-content: center;
+    min-height: 100vh; padding: 24px;
   }
-  input:focus, select:focus, textarea:focus { border-color: #3b82f6; box-shadow: 0 0 0 2px #bfdbfe; }
-  label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 4px; color: #374151; }
-  .form-group { margin-bottom: 12px; }
-  .row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-
-  button.primary {
-    width: 100%; background: #1d4ed8; color: #fff; padding: 10px;
-    border: none; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 15px;
+  .logo {
+    text-align: center; margin-bottom: 32px;
   }
-  button.primary:hover { background: #1e40af; }
-  button.primary:disabled { opacity: 0.6; cursor: not-allowed; }
-
-  .auth-box { max-width: 380px; margin: 60px auto; background: #fff; padding: 24px; border-radius: 16px; border: 1px solid #e5e7eb; }
-  .auth-box h1 { text-align: center; color: #1d4ed8; font-size: 22px; margin-bottom: 4px; }
-  .auth-box .sub { text-align: center; }
-  .auth-box p.link { text-align: center; font-size: 14px; color: #6b7280; margin-top: 12px; }
-  .auth-box p.link a { color: #1d4ed8; text-decoration: none; }
-  .auth-box p.link a:hover { text-decoration: underline; }
-  .erro { color: #dc2626; font-size: 13px; margin-bottom: 8px; }
-
-  .badge {
-    font-size: 11px; padding: 3px 8px; border-radius: 999px;
-    border: 1px solid; font-weight: 600; white-space: nowrap;
+  .logo-circle {
+    width: 80px; height: 80px; margin: 0 auto 16px;
+    background: linear-gradient(135deg, var(--azul), var(--azul-claro));
+    border-radius: 24px; display: flex; align-items: center; justify-content: center;
+    font-size: 40px; box-shadow: var(--sombra);
   }
-  .b-ok { background: #dcfce7; color: #166534; border-color: #86efac; }
-  .b-atencao { background: #fef9c3; color: #854d0e; border-color: #fde047; }
-  .b-critico { background: #ffedd5; color: #9a3412; border-color: #fdba74; }
-  .b-vencido { background: #fee2e2; color: #991b1b; border-color: #fca5a5; }
+  .logo h1 { font-size: 26px; color: var(--azul); }
+  .logo p { color: var(--cinza); font-size: 14px; margin-top: 4px; }
 
-  .cat-tag { font-size: 11px; padding: 3px 8px; border-radius: 6px; border: 1px solid; font-weight: 600; }
-  .cat-BPC { background: #dbeafe; color: #1e40af; border-color: #93c5fd; }
-  .cat-HC { background: #f3e8ff; color: #6b21a8; border-color: #d8b4fe; }
-  .cat-Maionese { background: #fef9c3; color: #854d0e; border-color: #fde047; }
-  .cat-OutrosMols { background: #ffedd5; color: #9a3412; border-color: #fdba74; }
-  .cat-Caldo { background: #fef3c7; color: #92400e; border-color: #fcd34d; }
-  .cat-Tempero { background: #fee2e2; color: #991b1b; border-color: #fca5a5; }
-  .cat-Amido { background: #dcfce7; color: #166534; border-color: #86efac; }
-  .cat-ComplementoAlimentar { background: #fce7f3; color: #9d174d; border-color: #f9a8d4; }
-  .cat-FoodSolution { background: #cffafe; color: #155e75; border-color: #67e8f9; }
-
-  .produto { background: #fff; border: 1px solid #e5e7eb; border-radius: 12px; padding: 14px; margin-bottom: 10px; }
-  .produto-top { display: flex; justify-content: space-between; align-items: start; gap: 10px; margin-bottom: 8px; }
-  .produto-top h3 { font-size: 16px; margin-bottom: 2px; }
-  .produto-top small { color: #6b7280; font-size: 13px; }
-  .produto-info { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; font-size: 12px; color: #6b7280; }
-  .produto-acoes { text-align: right; margin-top: 10px; }
-  .produto-acoes button {
-    background: none; border: none; color: #dc2626; cursor: pointer;
-    font-size: 13px; text-decoration: underline;
+  .campo { margin-bottom: 16px; }
+  .campo label {
+    display: block; font-size: 13px; font-weight: 600;
+    color: var(--texto); margin-bottom: 6px;
+  }
+  .campo input, .campo select {
+    width: 100%; padding: 14px 16px; border: 2px solid #E4E8F5;
+    border-radius: 14px; font-size: 15px; font-family: inherit;
+    background: var(--card); transition: .2s;
+  }
+  .campo input:focus {
+    outline: none; border-color: var(--azul-claro);
+    box-shadow: 0 0 0 4px rgba(74,99,231,.1);
   }
 
-  .filtros { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 16px; }
-  .filtros button {
-    font-size: 12px; padding: 4px 12px; border-radius: 999px;
-    border: 1px solid #d1d5db; background: #fff; cursor: pointer; font-weight: 600;
+  .btn {
+    width: 100%; padding: 16px; border: none; border-radius: 14px;
+    background: linear-gradient(135deg, var(--azul), var(--azul-claro));
+    color: white; font-size: 16px; font-weight: 600; font-family: inherit;
+    cursor: pointer; transition: .2s; box-shadow: 0 6px 16px rgba(31,54,199,.25);
   }
-  .filtros button.ativo { background: #1d4ed8; color: #fff; border-color: #1d4ed8; }
+  .btn:active { transform: scale(.97); }
+  .btn-secundario {
+    background: var(--card); color: var(--azul); border: 2px solid #E4E8F5;
+    box-shadow: none;
+  }
 
-  .busca { margin-bottom: 12px; }
-  .lista-produtos { display: grid; gap: 10px; }
-  @media (min-width: 700px) { .lista-produtos { grid-template-columns: 1fr 1fr; } }
+  /* ---------- HEADER ---------- */
+  .header { margin-bottom: 20px; }
+  .header h2 { font-size: 22px; }
+  .header .sub { color: var(--cinza); font-size: 13px; margin-top: 2px; }
 
-  .cat-lista { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 14px; }
-  @media (min-width: 700px) { .cat-lista { grid-template-columns: repeat(3, 1fr); } }
-  .cat-lista div { display: flex; justify-content: space-between; border: 1px solid #e5e7eb; padding: 8px 12px; border-radius: 8px; }
-  .cat-lista strong { font-weight: 700; }
+  /* ---------- CARDS RESUMO ---------- */
+  .resumo {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;
+    margin-bottom: 24px;
+  }
+  .card-resumo {
+    background: var(--card); border-radius: 16px; padding: 14px 8px;
+    text-align: center; box-shadow: var(--sombra);
+  }
+  .card-resumo .num { font-family: 'Poppins'; font-size: 22px; font-weight: 700; }
+  .card-resumo .lbl { font-size: 11px; color: var(--cinza); margin-top: 2px; }
+  .card-resumo.bw .num { color: #E91E63; }
+  .card-resumo.hc .num { color: #2196F3; }
+  .card-resumo.nt .num { color: #FF9800; }
 
-  .vazio { color: #6b7280; font-size: 14px; text-align: center; padding: 20px 0; }
+  /* ---------- LISTA PRODUTOS ---------- */
+  .produto {
+    background: var(--card); border-radius: 18px; padding: 14px;
+    margin-bottom: 12px; box-shadow: var(--sombra);
+    display: flex; gap: 14px; align-items: center;
+    border-left: 5px solid var(--verde); position: relative;
+  }
+  .produto.alerta { border-left-color: var(--amarelo); }
+  .produto.vencido { border-left-color: var(--vermelho); }
+  .produto .icone-produto {
+    width: 58px; height: 58px; border-radius: 12px;
+    background: #EEF1FB; display: flex; align-items: center;
+    justify-content: center; font-size: 24px; flex-shrink: 0;
+  }
+  .produto .info { flex: 1; min-width: 0; }
+  .produto .nome { font-weight: 600; font-size: 15px; margin-bottom: 4px;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .produto .cat {
+    display: inline-block; font-size: 10px; font-weight: 700;
+    padding: 2px 8px; border-radius: 6px; margin-bottom: 6px;
+  }
+  .cat.BW { background: #FCE4EC; color: #E91E63; }
+  .cat.HC { background: #E3F2FD; color: #2196F3; }
+  .cat.NT { background: #FFF3E0; color: #FF9800; }
+  .produto .dias { font-size: 12px; font-weight: 600; }
+  .produto .dias.ok { color: var(--verde); }
+  .produto .dias.alerta { color: var(--amarelo); }
+  .produto .dias.vencido { color: var(--vermelho); }
+  .produto .data { font-size: 11px; color: var(--cinza); margin-top: 2px; }
+  .produto .del {
+    position: absolute; top: 10px; right: 10px; background: #FFEBEE;
+    border: none; color: var(--vermelho); width: 28px; height: 28px;
+    border-radius: 8px; font-size: 16px; cursor: pointer;
+  }
+
+  .vazio {
+    text-align: center; padding: 60px 20px; color: var(--cinza);
+  }
+  .vazio .emoji { font-size: 48px; margin-bottom: 12px; }
+
+  /* ---------- BOTÃO FLUTUANTE ---------- */
+  .fab {
+    position: fixed; bottom: 90px; right: 20px; width: 60px; height: 60px;
+    border-radius: 20px; border: none; background: linear-gradient(135deg, var(--azul), var(--azul-claro));
+    color: white; font-size: 30px; cursor: pointer; box-shadow: 0 8px 20px rgba(31,54,199,.4);
+    display: flex; align-items: center; justify-content: center; transition: .2s;
+  }
+  .fab:active { transform: scale(.9); }
+
+  /* ---------- NAV INFERIOR ---------- */
+  .nav {
+    position: fixed; bottom: 0; left: 0; right: 0; background: var(--card);
+    display: flex; padding: 10px 0 14px; box-shadow: 0 -4px 16px rgba(0,0,0,.05);
+    z-index: 10;
+  }
+  .nav button {
+    flex: 1; background: none; border: none; font-family: inherit;
+    font-size: 11px; color: var(--cinza); cursor: pointer;
+    display: flex; flex-direction: column; align-items: center; gap: 2px;
+  }
+  .nav button .icone { font-size: 20px; }
+  .nav button.ativo { color: var(--azul); font-weight: 600; }
+
+  /* ---------- MODAL ---------- */
+  .modal-bg {
+    position: fixed; inset: 0; background: rgba(20,25,50,.5);
+    display: none; align-items: flex-end; z-index: 100;
+  }
+  .modal-bg.aberto { display: flex; }
+  .modal {
+    background: var(--card); width: 100%; border-radius: 24px 24px 0 0;
+    padding: 24px 20px calc(24px + env(safe-area-inset-bottom));
+    max-height: 90vh; overflow-y: auto;
+    animation: slideUp .3s ease;
+  }
+  @keyframes slideUp { from { transform: translateY(100%); } to { transform: none; } }
+  .modal h3 { font-size: 19px; margin-bottom: 18px; display: flex; justify-content: space-between; align-items: center; }
+  .modal .fechar { background: #F0F2FA; border: none; width: 32px; height: 32px; border-radius: 10px; font-size: 18px; cursor: pointer; }
+
+  .grupo-cats { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 16px; }
+  .cat-btn {
+    padding: 12px 6px; border: 2px solid #E4E8F5; background: var(--card);
+    border-radius: 12px; font-family: inherit; font-size: 12px; font-weight: 600;
+    cursor: pointer; transition: .2s;
+  }
+  .cat-btn.sel { border-color: var(--azul); background: #EEF1FF; color: var(--azul); }
+
+  .toast {
+    position: fixed; top: 20px; left: 50%; transform: translateX(-50%) translateY(-100px);
+    background: var(--verde); color: white; padding: 12px 20px; border-radius: 12px;
+    font-size: 14px; font-weight: 600; z-index: 200; transition: .3s;
+    box-shadow: 0 8px 20px rgba(67,160,71,.3);
+  }
+  .toast.show { transform: translateX(-50%) translateY(0); }
 </style>
 </head>
 <body>
 
-<!-- ================= LOGIN ================= -->
-<section id="tela-login" class="hidden">
-  <div class="auth-box">
-    <h1>Univalidade</h1>
-    <p class="sub">Controle de validade Unilever</p>
-    <form id="form-login">
-      <div class="form-group">
-        <label>Loja</label>
-        <input id="login-loja" required placeholder="Nome da loja" />
-      </div>
-      <div class="form-group">
-        <label>Senha</label>
-        <input id="login-senha" type="password" required />
-      </div>
-      <p class="erro hidden" id="login-erro"></p>
-      <button class="primary" type="submit">Entrar</button>
-      <p class="link">Nova loja? <a href="#" data-tela="cadastro">Cadastre-se</a></p>
-    </form>
+<!-- ========== TELA LOGIN ========== -->
+<div id="telaLogin" class="tela ativa">
+  <div class="login-wrap">
+    <div class="logo">
+      <div class="logo-circle">📦</div>
+      <h1>UniValidade</h1>
+      <p>Controle de validade dos produtos</p>
+    </div>
+    <div class="campo">
+      <label>Nome do Promotor</label>
+      <input id="inNome" placeholder="Ex: João Silva" autocomplete="name">
+    </div>
+    <div class="campo">
+      <label>Loja</label>
+      <input id="inLoja" placeholder="Ex: Supermercado Bom Preço">
+    </div>
+    <div class="campo">
+      <label>Cidade</label>
+      <input id="inCidade" placeholder="Ex: São Paulo">
+    </div>
+    <button class="btn" onclick="entrar()">Entrar no Sistema →</button>
   </div>
-</section>
+</div>
 
-<!-- ================= CADASTRO ================= -->
-<section id="tela-cadastro" class="hidden">
-  <div class="auth-box">
-    <h1>Nova Loja</h1>
-    <p class="sub">Cadastre seu promotor</p>
-    <form id="form-cadastro">
-      <div class="form-group">
-        <label>Nome do promotor</label>
-        <input id="cad-nome" required />
-      </div>
-      <div class="form-group">
-        <label>Loja</label>
-        <input id="cad-loja" required />
-      </div>
-      <div class="form-group">
-        <label>Cidade</label>
-        <input id="cad-cidade" required />
-      </div>
-      <div class="form-group">
-        <label>Senha</label>
-        <input id="cad-senha" type="password" required />
-      </div>
-      <p class="erro hidden" id="cad-erro"></p>
-      <button class="primary" type="submit">Cadastrar</button>
-      <p class="link">Já tem conta? <a href="#" data-tela="login">Entrar</a></p>
-    </form>
+<!-- ========== TELA DASHBOARD ========== -->
+<div id="telaDash" class="tela">
+  <div class="header">
+    <h2>Olá, <span id="saudNome">Promotor</span> 👋</h2>
+    <p class="sub" id="saudLoja">—</p>
   </div>
-</section>
 
-<!-- ================= DASHBOARD ================= -->
-<section id="tela-dashboard" class="hidden">
-  <header>
-    <h1>Univalidade</h1>
-    <nav>
-      <a href="#" data-tela="dashboard">Dashboard</a>
-      <a href="#" data-tela="produtos">Produtos</a>
-      <a href="#" class="btn-novo" data-tela="novo">+ Novo</a>
-      <button id="btn-sair">Sair</button>
-    </nav>
-  </header>
-  <main>
-    <h2>Dashboard</h2>
-    <p class="sub" id="dash-info"></p>
+  <div class="resumo">
+    <div class="card-resumo bw">
+      <div class="num" id="countBW">0</div>
+      <div class="lbl">Beauty W.</div>
+    </div>
+    <div class="card-resumo hc">
+      <div class="num" id="countHC">0</div>
+      <div class="lbl">Home Care</div>
+    </div>
+    <div class="card-resumo nt">
+      <div class="num" id="countNT">0</div>
+      <div class="lbl">Nutrition</div>
+    </div>
+  </div>
 
-    <div class="grid-cards">
-      <div class="stat total"><p>Total</p><p id="stat-total">0</p></div>
-      <div class="stat vencido"><p>Vencidos</p><p id="stat-vencido">0</p></div>
-      <div class="stat critico"><p>≤ 7 dias</p><p id="stat-critico">0</p></div>
-      <div class="stat atencao"><p>8–30 dias</p><p id="stat-atencao">0</p></div>
+  <div class="header" style="margin-bottom:12px">
+    <h2 style="font-size:17px">Produtos cadastrados</h2>
+  </div>
+  <div id="listaProdutos"></div>
+</div>
+
+<!-- ========== BOTÃO FLUTUANTE ========== -->
+<button class="fab" id="fab" onclick="abrirModal()" style="display:none">+</button>
+
+<!-- ========== NAV INFERIOR ========== -->
+<div class="nav" id="nav" style="display:none">
+  <button class="ativo" onclick="irPara('dash', this)">
+    <span class="icone">🏠</span> Início
+  </button>
+  <button onclick="sair()">
+    <span class="icone">🚪</span> Sair
+  </button>
+</div>
+
+<!-- ========== MODAL CADASTRO ========== -->
+<div class="modal-bg" id="modalBg">
+  <div class="modal">
+    <h3>Novo Produto <button class="fechar" onclick="fecharModal()">✕</button></h3>
+
+    <div class="campo">
+      <label>Nome do Produto</label>
+      <input id="inProduto" placeholder="Ex: Maionese Hellmann's 500g">
     </div>
 
-    <div class="card">
-      <h3 style="margin-bottom:12px;">Produtos por categoria</h3>
-      <div class="cat-lista" id="dash-categorias"></div>
+    <div class="campo">
+      <label>Marca</label>
+      <input id="inMarca" placeholder="Ex: Hellmann's">
     </div>
 
-    <div class="card">
-      <h3 style="margin-bottom:12px;">Próximos a vencer</h3>
-      <div id="dash-proximos"></div>
+    <div class="campo">
+      <label>Categoria</label>
+      <div class="grupo-cats">
+        <button type="button" class="cat-btn" data-cat="BW" onclick="selCat(this)">BW</button>
+        <button type="button" class="cat-btn" data-cat="HC" onclick="selCat(this)">HC</button>
+        <button type="button" class="cat-btn" data-cat="NT" onclick="selCat(this)">NT</button>
+      </div>
     </div>
-  </main>
-</section>
 
-<!-- ================= LISTA DE PRODUTOS ================= -->
-<section id="tela-produtos" class="hidden">
-  <header>
-    <h1>Univalidade</h1>
-    <nav>
-      <a href="#" data-tela="dashboard">Dashboard</a>
-      <a href="#" data-tela="produtos">Produtos</a>
-      <a href="#" class="btn-novo" data-tela="novo">+ Novo</a>
-      <button id="btn-sair-2">Sair</button>
-    </nav>
-  </header>
-  <main>
-    <h2>Produtos</h2>
-    <p class="sub">Filtre, busque e gerencie</p>
+    <div class="campo">
+      <label>Data de Validade</label>
+      <input type="date" id="inValidade">
+    </div>
 
-    <input id="busca" class="busca" placeholder="Buscar por nome ou marca..." />
-    <div class="filtros" id="filtros"></div>
-    <div class="lista-produtos" id="lista-produtos"></div>
-  </main>
-</section>
+    <button class="btn" onclick="salvarProduto()">💾 Salvar Produto</button>
+  </div>
+</div>
 
-<!-- ================= NOVO PRODUTO ================= -->
-<section id="tela-novo" class="hidden">
-  <header>
-    <h1>Univalidade</h1>
-    <nav>
-      <a href="#" data-tela="dashboard">Dashboard</a>
-      <a href="#" data-tela="produtos">Produtos</a>
-      <a href="#" class="btn-novo" data-tela="novo">+ Novo</a>
-      <button id="btn-sair-3">Sair</button>
-    </nav>
-  </header>
-  <main style="max-width:640px;">
-    <h2>Novo Produto</h2>
-    <p class="sub">Preencha os dados do item</p>
-    <form id="form-produto" class="card">
-      <div class="form-group">
-        <label>Nome do produto</label>
-        <input id="p-nome" required />
-      </div>
-      <div class="row">
-        <div class="form-group">
-          <label>Marca</label>
-          <input id="p-marca" required />
-        </div>
-        <div class="form-group">
-          <label>Gramatura / Volume</label>
-          <input id="p-gramatura" placeholder="Ex: 500g, 1kg, 900ml" required />
-        </div>
-      </div>
-      <div class="row">
-        <div class="form-group">
-          <label>Quantidade</label>
-          <input id="p-quantidade" type="number" min="1" value="1" required />
-        </div>
-        <div class="form-group">
-          <label>Categoria</label>
-          <select id="p-categoria" required></select>
-        </div>
-      </div>
-      <div class="row">
-        <div class="form-group">
-          <label>Data de validade</label>
-          <input id="p-validade" type="date" required />
-        </div>
-        <div class="form-group">
-          <label>Lote (opcional)</label>
-          <input id="p-lote" />
-        </div>
-      </div>
-      <div class="form-group">
-        <label>Observação (opcional)</label>
-        <textarea id="p-observacao" rows="2"></textarea>
-      </div>
-      <p class="erro hidden" id="prod-erro"></p>
-      <button class="primary" type="submit">Salvar produto</button>
-    </form>
-  </main>
-</section>
+<div class="toast" id="toast">✓ Produto salvo!</div>
 
 <script>
-/* ============ CONFIG ============ */
-const CATEGORIAS = [
-  'BPC','HC','Maionese','Outros Molhos','Caldo',
-  'Tempero','Amido','Complemento Alimentar','Food Solution'
-];
-const LS_PROMOTOR = 'univalidade_promotor';
-const LS_PRODUTOS = 'univalidade_produtos';
-const LS_LOJAS = 'univalidade_lojas';
-
-/* ============ HELPERS ============ */
-const $ = (id) => document.getElementById(id);
-const slug = (s) => s.replace(/\s+/g, '');
-
-function getLojas() { return JSON.parse(localStorage.getItem(LS_LOJAS) || '[]'); }
-function setLojas(l) { localStorage.setItem(LS_LOJAS, JSON.stringify(l)); }
-function getProdutos() { return JSON.parse(localStorage.getItem(LS_PRODUTOS) || '[]'); }
-function setProdutos(p) { localStorage.setItem(LS_PRODUTOS, JSON.stringify(p)); }
-function getPromotor() {
-  const raw = localStorage.getItem(LS_PROMOTOR);
-  return raw ? JSON.parse(raw) : null;
-}
-function setPromotor(p) { localStorage.setItem(LS_PROMOTOR, JSON.stringify(p)); }
-function sair() {
-  localStorage.removeItem(LS_PROMOTOR);
-  mostrarTela('login');
-}
-
-function diasRestantes(dataStr) {
-  const hoje = new Date(); hoje.setHours(0,0,0,0);
-  const d = new Date(dataStr + 'T00:00:00');
-  return Math.ceil((d - hoje) / 86400000);
-}
-function statusValidade(dataStr) {
-  const d = diasRestantes(dataStr);
-  if (d < 0) return 'vencido';
-  if (d <= 7) return 'critico';
-  if (d <= 30) return 'atencao';
-  return 'ok';
-}
-function labelStatus(dataStr) {
-  const s = statusValidade(dataStr);
-  const d = diasRestantes(dataStr);
-  const nomes = { ok: 'OK', atencao: 'Atenção', critico: 'Crítico', vencido: 'Vencido' };
-  return d < 0 ? `${nomes[s]} (${Math.abs(d)}d)` : `${nomes[s]} (${d}d)`;
-}
-function formatarData(s) {
-  return new Date(s + 'T00:00:00').toLocaleDateString('pt-BR');
-}
-
-/* ============ NAVEGAÇÃO ============ */
-function mostrarTela(nome) {
-  const promotor = getPromotor();
-  const precisaLogin = ['dashboard','produtos','novo'].includes(nome);
-  if (precisaLogin && !promotor) nome = 'login';
-
-  document.querySelectorAll('section').forEach(s => s.classList.add('hidden'));
-  $('tela-' + nome).classList.remove('hidden');
-
-  if (nome === 'dashboard') renderDashboard();
-  if (nome === 'produtos') renderProdutos();
-  if (nome === 'novo') resetFormProduto();
-  window.scrollTo(0,0);
-}
-
-document.body.addEventListener('click', (e) => {
-  const alvo = e.target.closest('[data-tela]');
-  if (alvo) {
-    e.preventDefault();
-    mostrarTela(alvo.dataset.tela);
-  }
-});
-['btn-sair','btn-sair-2','btn-sair-3'].forEach(id => {
-  const el = $(id); if (el) el.addEventListener('click', sair);
-});
+/* ============ ESTADO ============ */
+let promotor = null;
+let produtos = JSON.parse(localStorage.getItem('univalidade_produtos') || '[]');
+let categoriaSelecionada = null;
 
 /* ============ LOGIN ============ */
-$('form-login').addEventListener('submit', (e) => {
-  e.preventDefault();
-  const loja = $('login-loja').value.trim().toLowerCase();
-  const senha = $('login-senha').value;
-  const erro = $('login-erro');
-  erro.classList.add('hidden');
+function entrar() {
+  const nome = document.getElementById('inNome').value.trim();
+  const loja = document.getElementById('inLoja').value.trim();
+  const cidade = document.getElementById('inCidade').value.trim();
 
-  const encontrado = getLojas().find(l => l.loja.toLowerCase() === loja && l.senha === senha);
-  if (!encontrado) {
-    erro.textContent = 'Loja ou senha inválidos.';
-    erro.classList.remove('hidden');
+  if (!nome || !loja || !cidade) {
+    mostrarToast('Preencha todos os campos', '#E53935');
     return;
   }
-  setPromotor({ nome: encontrado.nome, loja: encontrado.loja, cidade: encontrado.cidade });
-  mostrarTela('dashboard');
-});
 
-/* ============ CADASTRO ============ */
-$('form-cadastro').addEventListener('submit', (e) => {
-  e.preventDefault();
-  const erro = $('cad-erro');
-  erro.classList.add('hidden');
+  promotor = { nome, loja, cidade };
+  localStorage.setItem('univalidade_promotor', JSON.stringify(promotor));
+
+  document.getElementById('saudNome').textContent = nome.split(' ')[0];
+  document.getElementById('saudLoja').textContent = `${loja} • ${cidade}`;
+
+  document.getElementById('telaLogin').classList.remove('ativa');
+  document.getElementById('telaDash').classList.add('ativa');
+  document.getElementById('fab').style.display = 'flex';
+  document.getElementById('nav').style.display = 'flex';
+
+  renderizar();
+}
+
+function sair() {
+  localStorage.removeItem('univalidade_promotor');
+  location.reload();
+}
+
+/* ============ MODAL ============ */
+function abrirModal() {
+  document.getElementById('modalBg').classList.add('aberto');
+  document.getElementById('inProduto').value = '';
+  document.getElementById('inMarca').value = '';
+  document.getElementById('inValidade').value = '';
+  document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('sel'));
+  categoriaSelecionada = null;
+}
+
+function fecharModal() {
+  document.getElementById('modalBg').classList.remove('aberto');
+}
+
+function selCat(btn) {
+  document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('sel'));
+  btn.classList.add('sel');
+  categoriaSelecionada = btn.dataset.cat;
+}
+
+/* ============ SALVAR PRODUTO ============ */
+function salvarProduto() {
+  const nome = document.getElementById('inProduto').value.trim();
+  const marca = document.getElementById('inMarca').value.trim();
+  const validade = document.getElementById('inValidade').value;
+
+  if (!nome || !validade || !categoriaSelecionada) {
+    mostrarToast('Preencha nome, categoria e validade', '#E53935');
+    return;
+  }
 
   const novo = {
-    nome: $('cad-nome').value.trim(),
-    loja: $('cad-loja').value.trim(),
-    cidade: $('cad-cidade').value.trim(),
-    senha: $('cad-senha').value,
-  };
-  const lojas = getLojas();
-  if (lojas.some(l => l.loja.toLowerCase() === novo.loja.toLowerCase())) {
-    erro.textContent = 'Essa loja já está cadastrada.';
-    erro.classList.remove('hidden');
-    return;
-  }
-  lojas.push(novo);
-  setLojas(lojas);
-  setPromotor({ nome: novo.nome, loja: novo.loja, cidade: novo.cidade });
-  mostrarTela('dashboard');
-});
-
-/* ============ DASHBOARD ============ */
-function renderDashboard() {
-  const promotor = getPromotor();
-  $('dash-info').textContent = `${promotor.nome} • ${promotor.loja} — ${promotor.cidade}`;
-
-  const produtos = getProdutos().filter(p => p.loja === promotor.loja);
-  const ordenados = [...produtos].sort((a,b) => a.data_validade.localeCompare(b.data_validade));
-
-  const vencidos = ordenados.filter(p => diasRestantes(p.data_validade) < 0);
-  const criticos = ordenados.filter(p => { const d = diasRestantes(p.data_validade); return d >= 0 && d <= 7; });
-  const atencao = ordenados.filter(p => { const d = diasRestantes(p.data_validade); return d > 7 && d <= 30; });
-
-  $('stat-total').textContent = ordenados.length;
-  $('stat-vencido').textContent = vencidos.length;
-  $('stat-critico').textContent = criticos.length;
-  $('stat-atencao').textContent = atencao.length;
-
-  $('dash-categorias').innerHTML = CATEGORIAS.map(c => {
-    const total = ordenados.filter(p => p.categoria === c).length;
-    return `<div><span>${c}</span><strong>${total}</strong></div>`;
-  }).join('');
-
-  $('dash-proximos').innerHTML = ordenados.length === 0
-    ? '<p class="vazio">Nenhum produto cadastrado.</p>'
-    : ordenados.slice(0,8).map(p => `
-      <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid #f3f4f6;">
-        <div>
-          <p style="font-weight:600;font-size:14px;">${p.nome}</p>
-          <p style="font-size:12px;color:#6b7280;">${p.categoria}</p>
-        </div>
-        <span class="badge b-${statusValidade(p.data_validade)}">${labelStatus(p.data_validade)}</span>
-      </div>
-    `).join('');
-}
-
-/* ============ LISTA DE PRODUTOS ============ */
-let filtroAtual = 'Todas';
-
-function renderFiltros() {
-  const filtros = $('filtros');
-  const opcoes = ['Todas', ...CATEGORIAS];
-  filtros.innerHTML = opcoes.map(c => `
-    <button data-cat="${c}" class="${c === filtroAtual ? 'ativo' : ''}">${c}</button>
-  `).join('');
-  filtros.querySelectorAll('button').forEach(b => {
-    b.addEventListener('click', () => {
-      filtroAtual = b.dataset.cat;
-      renderProdutos();
-    });
-  });
-}
-
-function renderProdutos() {
-  const promotor = getPromotor();
-  if (!promotor) return;
-  renderFiltros();
-
-  const busca = ($('busca').value || '').toLowerCase();
-  const lista = getProdutos()
-    .filter(p => p.loja === promotor.loja)
-    .filter(p => filtroAtual === 'Todas' || p.categoria === filtroAtual)
-    .filter(p => !busca || p.nome.toLowerCase().includes(busca) || p.marca.toLowerCase().includes(busca))
-    .sort((a,b) => a.data_validade.localeCompare(b.data_validade));
-
-  const container = $('lista-produtos');
-  if (lista.length === 0) {
-    container.innerHTML = '<p class="vazio">Nenhum produto encontrado.</p>';
-    return;
-  }
-
-  container.innerHTML = lista.map(p => `
-    <div class="produto">
-      <div class="produto-top">
-        <div>
-          <h3>${p.nome}</h3>
-          <small>${p.marca} • ${p.gramatura} • Qtd: ${p.quantidade}</small>
-        </div>
-        <span class="badge b-${statusValidade(p.data_validade)}">${labelStatus(p.data_validade)}</span>
-      </div>
-      <div class="produto-info">
-        <span class="cat-tag cat-${slug(p.categoria)}">${p.categoria}</span>
-        <span>Validade: ${formatarData(p.data_validade)}</span>
-        ${p.lote ? `<span>Lote: ${p.lote}</span>` : ''}
-      </div>
-      ${p.observacao ? `<p style="font-size:13px;color:#4b5563;font-style:italic;margin-top:6px;">"${p.observacao}"</p>` : ''}
-      <div class="produto-acoes">
-        <button data-excluir="${p.id}">Excluir</button>
-      </div>
-    </div>
-  `).join('');
-
-  container.querySelectorAll('[data-excluir]').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const id = btn.dataset.excluir;
-      if (!confirm('Excluir este produto?')) return;
-      setProdutos(getProdutos().filter(p => p.id !== id));
-      renderProdutos();
-    });
-  });
-}
-
-$('busca').addEventListener('input', renderProdutos);
-
-/* ============ NOVO PRODUTO ============ */
-function resetFormProduto() {
-  $('form-produto').reset();
-  $('p-quantidade').value = 1;
-  $('prod-erro').classList.add('hidden');
-
-  const sel = $('p-categoria');
-  if (sel.options.length === 0) {
-    sel.innerHTML = CATEGORIAS.map(c => `<option value="${c}">${c}</option>`).join('');
-  }
-}
-
-$('form-produto').addEventListener('submit', (e) => {
-  e.preventDefault();
-  const promotor = getPromotor();
-  if (!promotor) return;
-
-  const novo = {
-    id: crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(),
+    id: Date.now(),
+    nome, marca,
+    categoria: categoriaSelecionada,
+    validade,
+    promotor: promotor.nome,
     loja: promotor.loja,
-    nome: $('p-nome').value.trim(),
-    marca: $('p-marca').value.trim(),
-    gramatura: $('p-gramatura').value.trim(),
-    quantidade: Number($('p-quantidade').value),
-    categoria: $('p-categoria').value,
-    data_validade: $('p-validade').value,
-    lote: $('p-lote').value.trim() || null,
-    observacao: $('p-observacao').value.trim() || null,
+    cidade: promotor.cidade
   };
 
-  const todos = getProdutos();
-  todos.push(novo);
-  setProdutos(todos);
-  mostrarTela('produtos');
-});
+  produtos.push(novo);
+  localStorage.setItem('univalidade_produtos', JSON.stringify(produtos));
 
-/* ============ BOOT ============ */
-mostrarTela(getPromotor() ? 'dashboard' : 'login');
+  fecharModal();
+  mostrarToast('✓ Produto cadastrado!');
+  renderizar();
+}
+
+/* ============ CALCULAR DIAS ============ */
+function diasRestantes(dataValidade) {
+  const hoje = new Date();
+  hoje.setHours(0,0,0,0);
+  const alvo = new Date(dataValidade + 'T00:00:00');
+  return Math.ceil((alvo - hoje) / (1000 * 60 * 60 * 24));
+}
+
+function classeDias(dias) {
+  if (dias < 0) return 'vencido';
+  if (dias <= 30) return 'alerta';
+  return 'ok';
+}
+
+function textoDias(dias) {
+  if (dias < 0) return `⚠️ Vencido há ${Math.abs(dias)} dia(s)`;
+  if (dias === 0) return `⚠️ Vence hoje!`;
+  if (dias === 1) return `Vence amanhã`;
+  return `Faltam ${dias} dias`;
+}
+
+/* ============ RENDERIZAR ============ */
+function renderizar() {
+  const lista = document.getElementById('listaProdutos');
+  const meus = produtos.filter(p => p.promotor === promotor.nome);
+
+  // contadores
+  document.getElementById('countBW').textContent = meus.filter(p => p.categoria === 'BW').length;
+  document.getElementById('countHC').textContent = meus.filter(p => p.categoria === 'HC').length;
+  document.getElementById('countNT').textContent = meus.filter(p => p.categoria === 'NT').length;
+
+  if (meus.length === 0) {
+    lista.innerHTML = `
+      <div class="vazio">
+        <div class="emoji">📦</div>
+        <p>Nenhum produto cadastrado ainda.</p>
+        <p style="font-size:13px;margin-top:6px">Toque no botão <b>+</b> para começar</p>
+      </div>`;
+    return;
+  }
+
+  // ordena por validade (mais próximo primeiro)
+  meus.sort((a, b) => new Date(a.validade) - new Date(b.validade));
+
+  lista.innerHTML = meus.map(p => {
+    const dias = diasRestantes(p.validade);
+    const cls = classeDias(dias);
+    const dataFmt = new Date(p.validade + 'T00:00:00').toLocaleDateString('pt-BR');
+    return `
+      <div class="produto ${cls}">
+        <div class="icone-produto">📦</div>
+        <div class="info">
+          <span class="cat ${p.categoria}">${p.categoria}</span>
+          <div class="nome">${p.nome}</div>
+          <div class="dias ${cls}">${textoDias(dias)}</div>
+          <div class="data">Validade: ${dataFmt}</div>
+        </div>
+        <button class="del" onclick="excluir(${p.id})">✕</button>
+      </div>`;
+  }).join('');
+}
+
+function excluir(id) {
+  if (!confirm('Excluir este produto?')) return;
+  produtos = produtos.filter(p => p.id !== id);
+  localStorage.setItem('univalidade_produtos', JSON.stringify(produtos));
+  renderizar();
+  mostrarToast('Produto removido');
+}
+
+/* ============ TOAST ============ */
+function mostrarToast(msg, cor = '#43A047') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.style.background = cor;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+/* ============ AUTO LOGIN ============ */
+window.onload = () => {
+  const salvo = localStorage.getItem('univalidade_promotor');
+  if (salvo) {
+    promotor = JSON.parse(salvo);
+    document.getElementById('inNome').value = promotor.nome;
+    document.getElementById('inLoja').value = promotor.loja;
+    document.getElementById('inCidade').value = promotor.cidade;
+    entrar();
+  }
+};
 </script>
 </body>
 </html>
