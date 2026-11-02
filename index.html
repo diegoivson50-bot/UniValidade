@@ -46,7 +46,29 @@
   display: block;
   object-fit: contain;    
 }
-  
+  .header-topo {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.header-topo img {
+  width: clamp(80px, 22vw, 130px);
+  height: auto;
+  display: block;
+}
+
+.header-topo .header-texto h2 {
+  font-size: 20px;
+}
+
+.header-topo .header-texto .sub {
+  color: var(--cinza);
+  font-size: 13px;
+  margin-top: 2px;
+}
   .logo-circle {
     width: 80px; height: 80px; margin: 0 auto 16px;
     background: linear-gradient(135deg, var(--azul), var(--azul-claro));
@@ -341,10 +363,13 @@
 
 <!-- ========== TELA DASHBOARD ========== -->
 <div id="telaDash" class="tela">
-  <div class="header">
+<div class="header-topo">
+  <img src="./images/logo-univalidade-real.svg" alt="Logo UniValidade">
+  <div class="header-texto">
     <h2>Olá, <span id="saudNome">Promotor</span> 👋</h2>
     <p class="sub" id="saudLoja">—</p>
   </div>
+</div>
 
   <div class="resumo" id="cardsCategorias"></div>
 
