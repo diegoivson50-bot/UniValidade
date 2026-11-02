@@ -54,6 +54,10 @@
   .card-resumo.outros .num { color: #43A047; }
   .card-resumo.granola .num { color: #E53935; }
   .card-resumo.food .num { color: #00ACC1; }
+  .card-resumo.amido .num { color: #6D4C41; }
+  .card-resumo.complemento .num { color: #3949AB; }
+  .card-resumo.tempero .num { color: #C0392B; }
+  .card-resumo.caldo .num { color: #00897B; }
 
   .secao-cat { margin-bottom: 8px; margin-top: 18px; display: flex; align-items: center; gap: 8px; }
   .secao-cat:first-child { margin-top: 0; }
@@ -64,6 +68,10 @@
   .secao-cat .badge.OUTROS { background: #E8F5E9; color: #43A047; }
   .secao-cat .badge.GRANOLA { background: #FFEBEE; color: #E53935; }
   .secao-cat .badge.FOOD { background: #E0F7FA; color: #00ACC1; }
+  .secao-cat .badge.AMIDO { background: #EFEBE9; color: #6D4C41; }
+  .secao-cat .badge.COMPLEMENTO { background: #E8EAF6; color: #3949AB; }
+  .secao-cat .badge.TEMPERO { background: #FDEDEC; color: #C0392B; }
+  .secao-cat .badge.CALDO { background: #E0F2F1; color: #00897B; }
   .secao-cat .qtd-sec { font-size: 12px; color: var(--cinza); font-weight: 600; }
 
   .produto { background: var(--card); border-radius: 18px; padding: 14px; margin-bottom: 12px; box-shadow: var(--sombra); display: flex; gap: 14px; align-items: flex-start; border-left: 5px solid var(--verde); position: relative; }
@@ -79,6 +87,10 @@
   .cat.OUTROS { background: #E8F5E9; color: #43A047; }
   .cat.GRANOLA { background: #FFEBEE; color: #E53935; }
   .cat.FOOD { background: #E0F7FA; color: #00ACC1; }
+  .cat.AMIDO { background: #EFEBE9; color: #6D4C41; }
+  .cat.COMPLEMENTO { background: #E8EAF6; color: #3949AB; }
+  .cat.TEMPERO { background: #FDEDEC; color: #C0392B; }
+  .cat.CALDO { background: #E0F2F1; color: #00897B; }
   .produto .dias { font-size: 12px; font-weight: 600; margin-top: 4px;}
   .produto .dias.ok { color: var(--verde); }
   .produto .dias.alerta { color: var(--amarelo); }
@@ -152,6 +164,10 @@
     <div class="card-resumo outros"><div class="num" id="countOUTROS">0</div><div class="lbl">Outros Molhos</div></div>
     <div class="card-resumo granola"><div class="num" id="countGRANOLA">0</div><div class="lbl">Granola</div></div>
     <div class="card-resumo food"><div class="num" id="countFOOD">0</div><div class="lbl">Food Sol.</div></div>
+    <div class="card-resumo amido"><div class="num" id="countAMIDO">0</div><div class="lbl">Amido</div></div>
+    <div class="card-resumo complemento"><div class="num" id="countCOMPLEMENTO">0</div><div class="lbl">Compl. Alim.</div></div>
+    <div class="card-resumo tempero"><div class="num" id="countTEMPERO">0</div><div class="lbl">Tempero</div></div>
+    <div class="card-resumo caldo"><div class="num" id="countCALDO">0</div><div class="lbl">Caldo</div></div>
   </div>
 
   <div class="header" style="margin-bottom:12px"><h2 style="font-size:17px">Produtos cadastrados</h2></div>
@@ -181,6 +197,10 @@
         <button type="button" class="cat-btn" data-cat="OUTROS" onclick="selCat(this)">Outros Molhos</button>
         <button type="button" class="cat-btn" data-cat="GRANOLA" onclick="selCat(this)">Granola</button>
         <button type="button" class="cat-btn" data-cat="FOOD" onclick="selCat(this)">Food Solution</button>
+        <button type="button" class="cat-btn" data-cat="AMIDO" onclick="selCat(this)">Amido</button>
+        <button type="button" class="cat-btn" data-cat="COMPLEMENTO" onclick="selCat(this)">Complemento Alimentar</button>
+        <button type="button" class="cat-btn" data-cat="TEMPERO" onclick="selCat(this)">Tempero</button>
+        <button type="button" class="cat-btn" data-cat="CALDO" onclick="selCat(this)">Caldo</button>
       </div>
     </div>
 
@@ -212,8 +232,19 @@ var categoriaSelecionada = null;
 var DIAS_LIMITE_CRITICO = 15;
 var DIAS_LIMITE_ATENCAO = 30;
 
-var CATEGORIAS_ORDEM = ['BPC', 'HC', 'MAIO', 'OUTROS', 'GRANOLA', 'FOOD'];
-var NOMES_CAT = { BPC: 'BPC', HC: 'HC', MAIO: 'Maionese', OUTROS: 'Outros Molhos', GRANOLA: 'Granola', FOOD: 'Food Solution' };
+var CATEGORIAS_ORDEM = ['BPC', 'HC', 'MAIO', 'OUTROS', 'GRANOLA', 'FOOD', 'AMIDO', 'COMPLEMENTO', 'TEMPERO', 'CALDO'];
+var NOMES_CAT = {
+  BPC: 'BPC',
+  HC: 'HC',
+  MAIO: 'Maionese',
+  OUTROS: 'Outros Molhos',
+  GRANOLA: 'Granola',
+  FOOD: 'Food Solution',
+  AMIDO: 'Amido',
+  COMPLEMENTO: 'Complemento Alimentar',
+  TEMPERO: 'Tempero',
+  CALDO: 'Caldo'
+};
 
 try {
   var pSalvo = localStorage.getItem('univalidade_promotor');
@@ -335,9 +366,9 @@ function classificarStatus(dias) {
 function textoDias(dias) {
   if (dias < 0) return '🚨 Vencido há ' + Math.abs(dias) + ' dia(s)';
   if (dias === 0) return '🚨 Vence hoje!';
-  if (dias <= DIAS_LIMITE_CRITICO) return '🚨 Faltam ' + dias + ' dia(s)';
-  if (dias <= DIAS_LIMITE_ATENCAO) return '⚠️ Faltam ' + dias + ' dias';
-  return '✓ Faltam ' + dias + ' dias';
+  if (dias <= DIAS_LIMITE_CRITICO) return '🚨 Faltam ' + dias + ' dia(s) para vencer';
+  if (dias <= DIAS_LIMITE_ATENCAO) return '⚠️ Faltam ' + dias + ' dias para vencer';
+  return '✓ Faltam ' + dias + ' dias para vencer';
 }
 
 function htmlCard(p) {
@@ -371,6 +402,10 @@ function renderizar() {
   document.getElementById('countOUTROS').textContent = meus.filter(function(p) { return p.categoria === 'OUTROS'; }).length;
   document.getElementById('countGRANOLA').textContent = meus.filter(function(p) { return p.categoria === 'GRANOLA'; }).length;
   document.getElementById('countFOOD').textContent = meus.filter(function(p) { return p.categoria === 'FOOD'; }).length;
+  document.getElementById('countAMIDO').textContent = meus.filter(function(p) { return p.categoria === 'AMIDO'; }).length;
+  document.getElementById('countCOMPLEMENTO').textContent = meus.filter(function(p) { return p.categoria === 'COMPLEMENTO'; }).length;
+  document.getElementById('countTEMPERO').textContent = meus.filter(function(p) { return p.categoria === 'TEMPERO'; }).length;
+  document.getElementById('countCALDO').textContent = meus.filter(function(p) { return p.categoria === 'CALDO'; }).length;
 
   if (meus.length === 0) {
     lista.innerHTML = '<div class="vazio"><div class="emoji">📦</div><p>Nenhum produto cadastrado ainda.</p><p style="font-size:13px;margin-top:6px">Toque no botão <b>+</b> para começar</p></div>';
