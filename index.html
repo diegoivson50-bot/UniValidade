@@ -18,6 +18,7 @@
     --verde: #43A047;
     --sombra: 0 4px 16px rgba(31,54,199,0.08);
   }
+
   * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
   body {
     font-family: 'Inter', sans-serif;
@@ -37,6 +38,15 @@
     min-height: 100vh; padding: 24px;
   }
   .logo { text-align: center; margin-bottom: 32px; }
+  .logo img {
+  width: clamp(240px, 55vw, 420px);
+  max-height: 200px;      
+  height: auto;
+  margin: 0 auto 20px;
+  display: block;
+  object-fit: contain;    
+}
+  
   .logo-circle {
     width: 80px; height: 80px; margin: 0 auto 16px;
     background: linear-gradient(135deg, var(--azul), var(--azul-claro));
@@ -310,8 +320,7 @@
 <div id="telaLogin" class="tela ativa">
   <div class="login-wrap">
     <div class="logo">
-       <img src="./images/logo-univalidade-real.svg" alt="Logo UniValidade"
-       style="width: 220px; max-width: 80%; height: auto; margin: 0 auto 16px; display: block;">
+       <img src="./images/logo-univalidade-real.svg" alt="Logo UniValidade">
       <p>Sua melhor forma de controlar a validade dos seus produtos Unilever!</p>
     </div>
     <div class="campo">
