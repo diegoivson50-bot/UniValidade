@@ -74,7 +74,8 @@
   .secao-cat .badge.CALDO { background: #E0F2F1; color: #00897B; }
   .secao-cat .qtd-sec { font-size: 12px; color: var(--cinza); font-weight: 600; }
 
-  .produto { background: var(--card); border-radius: 18px; padding: 14px; margin-bottom: 12px; box-shadow: var(--sombra); display: flex; gap: 14px; align-items: flex-start; border-left: 5px solid var(--verde); position: relative; }
+  .produto { background: var(--card); border-radius: 18px; padding: 14px; margin-bottom: 12px; box-shadow: var(--sombra); display: flex; gap: 14px; align-items: flex-start; border-left: 5px solid var(--verde); position: relative; cursor: pointer; transition: transform .15s; }
+  .produto:active { transform: scale(.98); }
   .produto.alerta { border-left-color: var(--amarelo); }
   .produto.vencido { border-left-color: var(--vermelho); }
   .produto .info { flex: 1; min-width: 0; padding-right: 24px; }
@@ -96,7 +97,7 @@
   .produto .dias.alerta { color: var(--amarelo); }
   .produto .dias.vencido { color: var(--vermelho); }
   .produto .data { font-size: 11px; color: var(--cinza); margin-top: 2px; }
-  .produto .del { position: absolute; top: 10px; right: 10px; background: #FFEBEE; border: none; color: var(--vermelho); width: 28px; height: 28px; border-radius: 8px; font-size: 16px; cursor: pointer; }
+  .produto .del { position: absolute; top: 10px; right: 10px; background: #FFEBEE; border: none; color: var(--vermelho); width: 28px; height: 28px; border-radius: 8px; font-size: 16px; cursor: pointer; z-index: 2; }
   
   .produto .icone-caixa { width: 48px; height: 48px; border-radius: 12px; background: #EEF1FB; display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; margin-top: 4px; }
 
@@ -128,6 +129,28 @@
 
   .toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%) translateY(-100px); background: var(--verde); color: white; padding: 12px 20px; border-radius: 12px; font-size: 14px; font-weight: 600; z-index: 200; transition: .3s; }
   .toast.show { transform: translateX(-50%) translateY(0); }
+
+  /* ===== DETALHE DO PRODUTO ===== */
+  .detalhe-topo { display: flex; align-items: center; gap: 12px; margin-bottom: 18px; }
+  .detalhe-topo .icone-grande { width: 60px; height: 60px; border-radius: 16px; background: #EEF1FB; display: flex; align-items: center; justify-content: center; font-size: 30px; flex-shrink: 0; }
+  .detalhe-topo .titulo { flex: 1; min-width: 0; }
+  .detalhe-topo .titulo .nome { font-family: 'Poppins', sans-serif; font-weight: 700; font-size: 18px; line-height: 1.2; word-wrap: break-word; }
+  .detalhe-topo .titulo .marca { font-size: 13px; color: var(--cinza); margin-top: 2px; }
+
+  .detalhe-info { background: #FAFBFF; border-radius: 14px; padding: 14px 16px; margin-bottom: 18px; border: 1px solid #E4E8F5; }
+  .detalhe-info .linha { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px dashed #E4E8F5; font-size: 14px; }
+  .detalhe-info .linha:last-child { border-bottom: none; }
+  .detalhe-info .linha .rotulo { color: var(--cinza); font-weight: 500; }
+  .detalhe-info .linha .valor { font-weight: 600; text-align: right; }
+  .detalhe-info .linha .valor.vencido { color: var(--vermelho); }
+  .detalhe-info .linha .valor.alerta { color: var(--amarelo); }
+  .detalhe-info .linha .valor.ok { color: var(--verde); }
+
+  .detalhe-qtd-label { font-size: 13px; font-weight: 600; margin-bottom: 8px; display: block; }
+  .detalhe-acoes { display: flex; gap: 8px; margin-top: 16px; }
+  .detalhe-acoes .btn { margin: 0; }
+  .btn-secundario { background: #F0F2FA; color: var(--texto); box-shadow: none; }
+  .btn-perigo { background: #FFEBEE; color: var(--vermelho); box-shadow: none; }
 </style>
 </head>
 <body>
@@ -181,6 +204,7 @@
   <button onclick="sair()"><span class="icone">🚪</span> Sair</button>
 </div>
 
+<!-- MODAL: NOVO PRODUTO -->
 <div class="modal-bg" id="modalBg">
   <div class="modal">
     <h3>Novo Produto <button class="fechar" onclick="fecharModal()">✕</button></h3>
@@ -222,12 +246,49 @@
   </div>
 </div>
 
+<!-- MODAL: DETALHE DO PRODUTO -->
+<div class="modal-bg" id="modalDetalheBg">
+  <div class="modal">
+    <h3>Detalhes do Produto <button class="fechar" onclick="fecharDetalhe()">✕</button></h3>
+
+    <div class="detalhe-topo">
+      <div class="icone-grande">📦</div>
+      <div class="titulo">
+        <div class="nome" id="detNome">—</div>
+        <div class="marca" id="detMarca">—</div>
+      </div>
+    </div>
+
+    <div class="detalhe-info">
+      <div class="linha"><span class="rotulo">Categoria</span><span class="valor" id="detCategoria">—</span></div>
+      <div class="linha"><span class="rotulo">Validade</span><span class="valor" id="detValidade">—</span></div>
+      <div class="linha"><span class="rotulo">Situação</span><span class="valor" id="detSituacao">—</span></div>
+      <div class="linha"><span class="rotulo">Loja</span><span class="valor" id="detLoja">—</span></div>
+      <div class="linha"><span class="rotulo">Cidade</span><span class="valor" id="detCidade">—</span></div>
+      <div class="linha"><span class="rotulo">Promotor</span><span class="valor" id="detPromotor">—</span></div>
+    </div>
+
+    <label class="detalhe-qtd-label">Quantidade em Estoque</label>
+    <div class="qtd-container">
+      <button type="button" class="qtd-btn" onclick="mudarQtdDetalhe(-1)">−</button>
+      <input type="number" id="detQtd" class="qtd-input" value="1" min="1">
+      <button type="button" class="qtd-btn" onclick="mudarQtdDetalhe(1)">+</button>
+    </div>
+
+    <div class="detalhe-acoes">
+      <button class="btn btn-secundario" onclick="fecharDetalhe()">Cancelar</button>
+      <button class="btn" onclick="salvarQuantidade()">💾 Salvar</button>
+    </div>
+  </div>
+</div>
+
 <div class="toast" id="toast">✓ Produto salvo!</div>
 
 <script>
 var promotor = null;
 var produtos = [];
 var categoriaSelecionada = null;
+var produtoDetalheId = null;
 
 var DIAS_LIMITE_CRITICO = 15;
 var DIAS_LIMITE_ATENCAO = 30;
@@ -292,6 +353,7 @@ function sair() {
   location.reload(); 
 }
 
+/* ===== MODAL NOVO PRODUTO ===== */
 function abrirModal() {
   document.getElementById('modalBg').classList.add('aberto');
   document.getElementById('inProduto').value = '';
@@ -350,6 +412,69 @@ function salvarProduto() {
   renderizar();
 }
 
+/* ===== MODAL DETALHE ===== */
+function abrirDetalhe(id) {
+  var p = produtos.find(function(x) { return String(x.id) === String(id); });
+  if (!p) return;
+
+  produtoDetalheId = id;
+
+  var dias = calcularDias(p.validade);
+  var cls = classificarStatus(dias);
+  var alvo = new Date(p.validade + 'T00:00:00');
+  var dataFmt = alvo.toLocaleDateString('pt-BR');
+
+  document.getElementById('detNome').textContent = p.nome;
+  document.getElementById('detMarca').textContent = p.marca ? p.marca : 'Sem marca';
+  document.getElementById('detCategoria').textContent = NOMES_CAT[p.categoria] || p.categoria;
+  document.getElementById('detValidade').textContent = dataFmt;
+
+  var elSit = document.getElementById('detSituacao');
+  elSit.textContent = textoDias(dias);
+  elSit.className = 'valor ' + cls;
+
+  document.getElementById('detLoja').textContent = p.loja || '—';
+  document.getElementById('detCidade').textContent = p.cidade || '—';
+  document.getElementById('detPromotor').textContent = p.promotor || '—';
+
+  document.getElementById('detQtd').value = p.quantidade;
+
+  document.getElementById('modalDetalheBg').classList.add('aberto');
+}
+
+function fecharDetalhe() {
+  document.getElementById('modalDetalheBg').classList.remove('aberto');
+  produtoDetalheId = null;
+}
+
+function mudarQtdDetalhe(valor) {
+  var input = document.getElementById('detQtd');
+  var atual = parseInt(input.value) || 1;
+  atual += valor;
+  if (atual < 1) atual = 1;
+  input.value = atual;
+}
+
+function salvarQuantidade() {
+  if (!produtoDetalheId) return;
+  var novaQtd = parseInt(document.getElementById('detQtd').value);
+  if (!novaQtd || novaQtd < 1) {
+    alert('Quantidade inválida');
+    return;
+  }
+
+  var idx = produtos.findIndex(function(x) { return String(x.id) === String(produtoDetalheId); });
+  if (idx === -1) return;
+
+  produtos[idx].quantidade = novaQtd;
+  localStorage.setItem('univalidade_produtos', JSON.stringify(produtos));
+
+  fecharDetalhe();
+  mostrarToast('✓ Quantidade atualizada!');
+  renderizar();
+}
+
+/* ===== CÁLCULOS ===== */
 function calcularDias(validade) {
   var hoje = new Date(); 
   hoje.setHours(0,0,0,0);
@@ -364,87 +489,4 @@ function classificarStatus(dias) {
 }
 
 function textoDias(dias) {
-  if (dias < 0) return '🚨 Vencido há ' + Math.abs(dias) + ' dia(s)';
-  if (dias === 0) return '🚨 Vence hoje!';
-  if (dias <= DIAS_LIMITE_CRITICO) return '🚨 Faltam ' + dias + ' dia(s) para vencer';
-  if (dias <= DIAS_LIMITE_ATENCAO) return '⚠️ Faltam ' + dias + ' dias para vencer';
-  return '✓ Faltam ' + dias + ' dias para vencer';
-}
-
-function htmlCard(p) {
-  var dias = calcularDias(p.validade);
-  var cls = classificarStatus(dias);
-  var alvo = new Date(p.validade + 'T00:00:00');
-  var dataFmt = alvo.toLocaleDateString('pt-BR');
-  var nomeExibicao = NOMES_CAT[p.categoria] || p.categoria;
-  
-  return '<div class="produto ' + cls + '">' +
-    '<div class="icone-caixa">📦</div>' +
-    '<div class="info">' +
-      '<div class="nome">' + p.nome + '</div>' +
-      '<div><span class="qtd-tag">📦 ' + p.quantidade + ' un</span><span class="cat ' + p.categoria + '">' + nomeExibicao + '</span></div>' +
-      '<div class="dias ' + cls + '">' + textoDias(dias) + '</div>' +
-      '<div class="data">Validade: ' + dataFmt + '</div>' +
-    '</div>' +
-    '<button class="del" onclick="excluir(\'' + p.id + '\')">✕</button>' +
-  '</div>';
-}
-
-function renderizar() {
-  var lista = document.getElementById('listaProdutos');
-  if (!promotor) return;
-
-  var meus = produtos.filter(function(p) { return p.promotor === promotor.nome; });
-
-  document.getElementById('countBPC').textContent = meus.filter(function(p) { return p.categoria === 'BPC'; }).length;
-  document.getElementById('countHC').textContent = meus.filter(function(p) { return p.categoria === 'HC'; }).length;
-  document.getElementById('countMAIO').textContent = meus.filter(function(p) { return p.categoria === 'MAIO'; }).length;
-  document.getElementById('countOUTROS').textContent = meus.filter(function(p) { return p.categoria === 'OUTROS'; }).length;
-  document.getElementById('countGRANOLA').textContent = meus.filter(function(p) { return p.categoria === 'GRANOLA'; }).length;
-  document.getElementById('countFOOD').textContent = meus.filter(function(p) { return p.categoria === 'FOOD'; }).length;
-  document.getElementById('countAMIDO').textContent = meus.filter(function(p) { return p.categoria === 'AMIDO'; }).length;
-  document.getElementById('countCOMPLEMENTO').textContent = meus.filter(function(p) { return p.categoria === 'COMPLEMENTO'; }).length;
-  document.getElementById('countTEMPERO').textContent = meus.filter(function(p) { return p.categoria === 'TEMPERO'; }).length;
-  document.getElementById('countCALDO').textContent = meus.filter(function(p) { return p.categoria === 'CALDO'; }).length;
-
-  if (meus.length === 0) {
-    lista.innerHTML = '<div class="vazio"><div class="emoji">📦</div><p>Nenhum produto cadastrado ainda.</p><p style="font-size:13px;margin-top:6px">Toque no botão <b>+</b> para começar</p></div>';
-    return;
-  }
-
-  // AGRUPAMENTO POR CATEGORIA
-  var html = '';
-  CATEGORIAS_ORDEM.forEach(function(cat) {
-    var itens = meus.filter(function(p) { return p.categoria === cat; });
-    if (itens.length === 0) return; // categoria vazia não aparece
-
-    itens.sort(function(a, b) { return new Date(a.validade) - new Date(b.validade); });
-
-    html += '<div class="secao-cat">' +
-      '<span class="badge ' + cat + '">' + NOMES_CAT[cat] + '</span>' +
-      '<span class="qtd-sec">' + itens.length + ' produto' + (itens.length > 1 ? 's' : '') + '</span>' +
-    '</div>';
-    html += itens.map(htmlCard).join('');
-  });
-
-  lista.innerHTML = html;
-}
-
-function excluir(id) {
-  if (!confirm('Excluir este produto?')) return;
-  produtos = produtos.filter(function(p) { return String(p.id) !== String(id); });
-  localStorage.setItem('univalidade_produtos', JSON.stringify(produtos));
-  renderizar();
-  mostrarToast('Produto removido');
-}
-
-function mostrarToast(msg, cor) {
-  if (!cor) cor = '#43A047';
-  var t = document.getElementById('toast');
-  t.textContent = msg; t.style.background = cor;
-  t.classList.add('show');
-  setTimeout(function() { t.classList.remove('show'); }, 2500);
-}
-</script>
-</body>
-</html>
+  if (d
