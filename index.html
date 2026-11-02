@@ -28,19 +28,15 @@
   }
   h1, h2, h3 { font-family: 'Poppins', sans-serif; }
 
-  /* ---------- TELAS ---------- */
   .tela { display: none; padding: 20px; }
   .tela.ativa { display: block; animation: fade .3s ease; }
   @keyframes fade { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
 
-  /* ---------- LOGIN ---------- */
   .login-wrap {
     display: flex; flex-direction: column; justify-content: center;
     min-height: 100vh; padding: 24px;
   }
-  .logo {
-    text-align: center; margin-bottom: 32px;
-  }
+  .logo { text-align: center; margin-bottom: 32px; }
   .logo-circle {
     width: 80px; height: 80px; margin: 0 auto 16px;
     background: linear-gradient(135deg, var(--azul), var(--azul-claro));
@@ -60,7 +56,7 @@
     border-radius: 14px; font-size: 15px; font-family: inherit;
     background: var(--card); transition: .2s;
   }
-  .campo input:focus {
+  .campo input:focus, .campo select:focus {
     outline: none; border-color: var(--azul-claro);
     box-shadow: 0 0 0 4px rgba(74,99,231,.1);
   }
@@ -72,32 +68,140 @@
     cursor: pointer; transition: .2s; box-shadow: 0 6px 16px rgba(31,54,199,.25);
   }
   .btn:active { transform: scale(.97); }
-  .btn-secundario {
-    background: var(--card); color: var(--azul); border: 2px solid #E4E8F5;
-    box-shadow: none;
-  }
 
-  /* ---------- HEADER ---------- */
   .header { margin-bottom: 20px; }
   .header h2 { font-size: 22px; }
   .header .sub { color: var(--cinza); font-size: 13px; margin-top: 2px; }
 
-  /* ---------- CARDS RESUMO ---------- */
   .resumo {
-    display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;
-    margin-bottom: 24px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    margin-bottom: 20px;
   }
   .card-resumo {
-    background: var(--card); border-radius: 16px; padding: 14px 8px;
-    text-align: center; box-shadow: var(--sombra);
+    background: var(--card);
+    border-radius: 14px;
+    padding: 12px 6px;
+    text-align: center;
+    box-shadow: var(--sombra);
+    border-top: 4px solid var(--azul);
+    min-height: 78px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    cursor: pointer;
+    transition: .2s;
+    position: relative;
+    user-select: none;
   }
-  .card-resumo .num { font-family: 'Poppins'; font-size: 22px; font-weight: 700; }
-  .card-resumo .lbl { font-size: 11px; color: var(--cinza); margin-top: 2px; }
-  .card-resumo.bw .num { color: #E91E63; }
-  .card-resumo.hc .num { color: #2196F3; }
-  .card-resumo.nt .num { color: #FF9800; }
+  .card-resumo:active { transform: scale(.96); }
+  .card-resumo.ativo {
+    background: #EEF1FF;
+    box-shadow: 0 0 0 2px var(--azul), var(--sombra);
+  }
+  .card-resumo.ativo::after {
+    content: "✓";
+    position: absolute;
+    top: 4px;
+    right: 6px;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--azul);
+  }
+  .card-resumo .num {
+    font-family: 'Poppins';
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--azul);
+    line-height: 1.1;
+  }
+  .card-resumo .lbl {
+    font-size: 10px;
+    color: var(--cinza);
+    margin-top: 4px;
+    font-weight: 600;
+    line-height: 1.2;
+    word-break: break-word;
+  }
+  .card-resumo.cat-bpc { border-top-color: #1F36C7; }
+  .card-resumo.cat-bpc .num { color: #1F36C7; }
+  .card-resumo.cat-hc { border-top-color: #2196F3; }
+  .card-resumo.cat-hc .num { color: #2196F3; }
+  .card-resumo.cat-maionese { border-top-color: #FBC02D; }
+  .card-resumo.cat-maionese .num { color: #F9A825; }
+  .card-resumo.cat-outros-molhos { border-top-color: #FB8C00; }
+  .card-resumo.cat-outros-molhos .num { color: #EF6C00; }
+  .card-resumo.cat-caldo { border-top-color: #FFA726; }
+  .card-resumo.cat-caldo .num { color: #F57C00; }
+  .card-resumo.cat-tempero { border-top-color: #E53935; }
+  .card-resumo.cat-tempero .num { color: #E53935; }
+  .card-resumo.cat-amido { border-top-color: #43A047; }
+  .card-resumo.cat-amido .num { color: #43A047; }
+  .card-resumo.cat-complemento { border-top-color: #E91E63; }
+  .card-resumo.cat-complemento .num { color: #E91E63; }
+  .card-resumo.cat-food { border-top-color: #00ACC1; }
+  .card-resumo.cat-food .num { color: #00ACC1; }
 
-  /* ---------- LISTA PRODUTOS ---------- */
+  .filtro-ativo {
+    display: none;
+    align-items: center;
+    justify-content: space-between;
+    background: #EEF1FF;
+    border: 2px solid var(--azul);
+    border-radius: 12px;
+    padding: 10px 14px;
+    margin-bottom: 16px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--azul);
+  }
+  .filtro-ativo.visivel { display: flex; }
+  .filtro-ativo button {
+    background: var(--azul);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 6px 10px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  .grupo-categoria { margin-bottom: 20px; animation: fade .3s ease; }
+  .grupo-categoria-header {
+    display: flex; align-items: center; gap: 8px;
+    margin-bottom: 10px; padding: 0 4px;
+  }
+  .grupo-categoria-header .barra-cor {
+    width: 4px; height: 20px; border-radius: 2px;
+    background: var(--azul); flex-shrink: 0;
+  }
+  .grupo-categoria-header h3 { font-size: 15px; flex: 1; }
+  .grupo-categoria-header .qtd-badge {
+    font-size: 11px; font-weight: 700;
+    background: #EEF1FF; color: var(--azul);
+    padding: 2px 8px; border-radius: 8px;
+  }
+  .grupo-categoria-header.bpc .barra-cor { background: #1F36C7; }
+  .grupo-categoria-header.bpc .qtd-badge { background: #E3E9FF; color: #1F36C7; }
+  .grupo-categoria-header.hc .barra-cor { background: #2196F3; }
+  .grupo-categoria-header.hc .qtd-badge { background: #E3F2FD; color: #1976D2; }
+  .grupo-categoria-header.maionese .barra-cor { background: #FBC02D; }
+  .grupo-categoria-header.maionese .qtd-badge { background: #FFF9C4; color: #F57F17; }
+  .grupo-categoria-header.outros-molhos .barra-cor { background: #FB8C00; }
+  .grupo-categoria-header.outros-molhos .qtd-badge { background: #FFF3E0; color: #E65100; }
+  .grupo-categoria-header.caldo .barra-cor { background: #FFA726; }
+  .grupo-categoria-header.caldo .qtd-badge { background: #FFF3E0; color: #EF6C00; }
+  .grupo-categoria-header.tempero .barra-cor { background: #E53935; }
+  .grupo-categoria-header.tempero .qtd-badge { background: #FFEBEE; color: #C62828; }
+  .grupo-categoria-header.amido .barra-cor { background: #43A047; }
+  .grupo-categoria-header.amido .qtd-badge { background: #E8F5E9; color: #2E7D32; }
+  .grupo-categoria-header.complemento .barra-cor { background: #E91E63; }
+  .grupo-categoria-header.complemento .qtd-badge { background: #FCE4EC; color: #C2185B; }
+  .grupo-categoria-header.food .barra-cor { background: #00ACC1; }
+  .grupo-categoria-header.food .qtd-badge { background: #E0F7FA; color: #00838F; }
+
   .produto {
     background: var(--card); border-radius: 18px; padding: 14px;
     margin-bottom: 12px; box-shadow: var(--sombra);
@@ -111,33 +215,40 @@
     background: #EEF1FB; display: flex; align-items: center;
     justify-content: center; font-size: 24px; flex-shrink: 0;
   }
-  .produto .info { flex: 1; min-width: 0; }
+  .produto .info { flex: 1; min-width: 0; padding-right: 24px; }
   .produto .nome { font-weight: 600; font-size: 15px; margin-bottom: 4px;
     white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .produto .cat {
-    display: inline-block; font-size: 10px; font-weight: 700;
-    padding: 2px 8px; border-radius: 6px; margin-bottom: 6px;
-  }
-  .cat.BW { background: #FCE4EC; color: #E91E63; }
-  .cat.HC { background: #E3F2FD; color: #2196F3; }
-  .cat.NT { background: #FFF3E0; color: #FF9800; }
+  .produto .marca-gram { font-size: 12px; color: var(--cinza); margin-bottom: 6px; }
   .produto .dias { font-size: 12px; font-weight: 600; }
   .produto .dias.ok { color: var(--verde); }
   .produto .dias.alerta { color: var(--amarelo); }
   .produto .dias.vencido { color: var(--vermelho); }
   .produto .data { font-size: 11px; color: var(--cinza); margin-top: 2px; }
+
+  .qtd-control {
+    display: inline-flex; align-items: center; gap: 6px; margin-top: 8px;
+    background: #F0F2FA; border-radius: 10px; padding: 3px;
+  }
+  .qtd-control button {
+    width: 28px; height: 28px; border: none; border-radius: 8px;
+    background: var(--card); color: var(--azul); font-size: 16px;
+    font-weight: 700; cursor: pointer; box-shadow: 0 1px 3px rgba(0,0,0,.08);
+  }
+  .qtd-control button:active { transform: scale(.92); }
+  .qtd-control .qtd-val {
+    min-width: 26px; text-align: center; font-size: 13px; font-weight: 700;
+    color: var(--texto);
+  }
+
   .produto .del {
     position: absolute; top: 10px; right: 10px; background: #FFEBEE;
     border: none; color: var(--vermelho); width: 28px; height: 28px;
     border-radius: 8px; font-size: 16px; cursor: pointer;
   }
 
-  .vazio {
-    text-align: center; padding: 60px 20px; color: var(--cinza);
-  }
+  .vazio { text-align: center; padding: 60px 20px; color: var(--cinza); }
   .vazio .emoji { font-size: 48px; margin-bottom: 12px; }
 
-  /* ---------- BOTÃO FLUTUANTE ---------- */
   .fab {
     position: fixed; bottom: 90px; right: 20px; width: 60px; height: 60px;
     border-radius: 20px; border: none; background: linear-gradient(135deg, var(--azul), var(--azul-claro));
@@ -146,7 +257,6 @@
   }
   .fab:active { transform: scale(.9); }
 
-  /* ---------- NAV INFERIOR ---------- */
   .nav {
     position: fixed; bottom: 0; left: 0; right: 0; background: var(--card);
     display: flex; padding: 10px 0 14px; box-shadow: 0 -4px 16px rgba(0,0,0,.05);
@@ -160,7 +270,6 @@
   .nav button .icone { font-size: 20px; }
   .nav button.ativo { color: var(--azul); font-weight: 600; }
 
-  /* ---------- MODAL ---------- */
   .modal-bg {
     position: fixed; inset: 0; background: rgba(20,25,50,.5);
     display: none; align-items: flex-end; z-index: 100;
@@ -176,11 +285,13 @@
   .modal h3 { font-size: 19px; margin-bottom: 18px; display: flex; justify-content: space-between; align-items: center; }
   .modal .fechar { background: #F0F2FA; border: none; width: 32px; height: 32px; border-radius: 10px; font-size: 18px; cursor: pointer; }
 
-  .grupo-cats { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 16px; }
+  .grupo-cats {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 16px;
+  }
   .cat-btn {
     padding: 12px 6px; border: 2px solid #E4E8F5; background: var(--card);
     border-radius: 12px; font-family: inherit; font-size: 12px; font-weight: 600;
-    cursor: pointer; transition: .2s;
+    cursor: pointer; transition: .2s; text-align: center;
   }
   .cat-btn.sel { border-color: var(--azul); background: #EEF1FF; color: var(--azul); }
 
@@ -226,19 +337,11 @@
     <p class="sub" id="saudLoja">—</p>
   </div>
 
-  <div class="resumo">
-    <div class="card-resumo bw">
-      <div class="num" id="countBW">0</div>
-      <div class="lbl">Beauty W.</div>
-    </div>
-    <div class="card-resumo hc">
-      <div class="num" id="countHC">0</div>
-      <div class="lbl">Home Care</div>
-    </div>
-    <div class="card-resumo nt">
-      <div class="num" id="countNT">0</div>
-      <div class="lbl">Nutrition</div>
-    </div>
+  <div class="resumo" id="cardsCategorias"></div>
+
+  <div class="filtro-ativo" id="filtroAtivo">
+    <span id="filtroAtivoTexto">Filtrando: —</span>
+    <button onclick="limparFiltro()">✕ Limpar</button>
   </div>
 
   <div class="header" style="margin-bottom:12px">
@@ -252,7 +355,7 @@
 
 <!-- ========== NAV INFERIOR ========== -->
 <div class="nav" id="nav" style="display:none">
-  <button class="ativo" onclick="irPara('dash', this)">
+  <button class="ativo">
     <span class="icone">🏠</span> Início
   </button>
   <button onclick="sair()">
@@ -267,7 +370,7 @@
 
     <div class="campo">
       <label>Nome do Produto</label>
-      <input id="inProduto" placeholder="Ex: Maionese Hellmann's 500g">
+      <input id="inProduto" placeholder="Ex: Maionese Hellmann's">
     </div>
 
     <div class="campo">
@@ -276,12 +379,18 @@
     </div>
 
     <div class="campo">
+      <label>Gramatura / Volume</label>
+      <input id="inGramatura" placeholder="Ex: 500g, 1kg, 900ml">
+    </div>
+
+    <div class="campo">
+      <label>Quantidade em estoque</label>
+      <input id="inQuantidade" type="number" min="1" value="1">
+    </div>
+
+    <div class="campo">
       <label>Categoria</label>
-      <div class="grupo-cats">
-        <button type="button" class="cat-btn" data-cat="BW" onclick="selCat(this)">BW</button>
-        <button type="button" class="cat-btn" data-cat="HC" onclick="selCat(this)">HC</button>
-        <button type="button" class="cat-btn" data-cat="NT" onclick="selCat(this)">NT</button>
-      </div>
+      <div class="grupo-cats" id="grupoCats"></div>
     </div>
 
     <div class="campo">
@@ -296,12 +405,25 @@
 <div class="toast" id="toast">✓ Produto salvo!</div>
 
 <script>
-/* ============ ESTADO ============ */
+const CATEGORIAS = [
+  { nome: 'BPC', slug: 'bpc' },
+  { nome: 'HC', slug: 'hc' },
+  { nome: 'Maionese', slug: 'maionese' },
+  { nome: 'Outros Molhos', slug: 'outros-molhos' },
+  { nome: 'Caldo', slug: 'caldo' },
+  { nome: 'Tempero', slug: 'tempero' },
+  { nome: 'Amido', slug: 'amido' },
+  { nome: 'Complemento Alimentar', slug: 'complemento' },
+  { nome: 'Food Solution', slug: 'food' }
+];
+
+const ORDEM_COR = { vencido: 0, alerta: 1, ok: 2 };
+
 let promotor = null;
 let produtos = JSON.parse(localStorage.getItem('univalidade_produtos') || '[]');
 let categoriaSelecionada = null;
+let filtroCategoria = null;
 
-/* ============ LOGIN ============ */
 function entrar() {
   const nome = document.getElementById('inNome').value.trim();
   const loja = document.getElementById('inLoja').value.trim();
@@ -331,11 +453,19 @@ function sair() {
   location.reload();
 }
 
-/* ============ MODAL ============ */
+function montarCategorias() {
+  const grupo = document.getElementById('grupoCats');
+  grupo.innerHTML = CATEGORIAS.map(c =>
+    `<button type="button" class="cat-btn" data-cat="${c.nome}" onclick="selCat(this)">${c.nome}</button>`
+  ).join('');
+}
+
 function abrirModal() {
   document.getElementById('modalBg').classList.add('aberto');
   document.getElementById('inProduto').value = '';
   document.getElementById('inMarca').value = '';
+  document.getElementById('inGramatura').value = '';
+  document.getElementById('inQuantidade').value = '1';
   document.getElementById('inValidade').value = '';
   document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('sel'));
   categoriaSelecionada = null;
@@ -351,10 +481,11 @@ function selCat(btn) {
   categoriaSelecionada = btn.dataset.cat;
 }
 
-/* ============ SALVAR PRODUTO ============ */
 function salvarProduto() {
   const nome = document.getElementById('inProduto').value.trim();
   const marca = document.getElementById('inMarca').value.trim();
+  const gramatura = document.getElementById('inGramatura').value.trim();
+  const quantidade = parseInt(document.getElementById('inQuantidade').value) || 1;
   const validade = document.getElementById('inValidade').value;
 
   if (!nome || !validade || !categoriaSelecionada) {
@@ -362,17 +493,18 @@ function salvarProduto() {
     return;
   }
 
-  const novo = {
+  produtos.push({
     id: Date.now(),
-    nome, marca,
+    nome,
+    marca,
+    gramatura,
+    quantidade,
     categoria: categoriaSelecionada,
     validade,
     promotor: promotor.nome,
     loja: promotor.loja,
     cidade: promotor.cidade
-  };
-
-  produtos.push(novo);
+  });
   localStorage.setItem('univalidade_produtos', JSON.stringify(produtos));
 
   fecharModal();
@@ -380,18 +512,35 @@ function salvarProduto() {
   renderizar();
 }
 
-/* ============ CALCULAR DIAS ============ */
+function alterarQtd(id, delta) {
+  const produto = produtos.find(p => p.id === id);
+  if (!produto) return;
+  produto.quantidade = Math.max(1, (produto.quantidade || 1) + delta);
+  localStorage.setItem('univalidade_produtos', JSON.stringify(produtos));
+  renderizar();
+}
+
+function filtrarPorCategoria(nomeCategoria) {
+  filtroCategoria = (filtroCategoria === nomeCategoria) ? null : nomeCategoria;
+  renderizar();
+}
+
+function limparFiltro() {
+  filtroCategoria = null;
+  renderizar();
+}
+
 function diasRestantes(dataValidade) {
   const hoje = new Date();
-  hoje.setHours(0,0,0,0);
+  hoje.setHours(0, 0, 0, 0);
   const alvo = new Date(dataValidade + 'T00:00:00');
-  return Math.ceil((alvo - hoje) / (1000 * 60 * 60 * 24));
+  return Math.ceil((alvo - hoje) / 86400000);
 }
 
 function classeDias(dias) {
-  if (dias < 0) return 'vencido';
-  if (dias <= 30) return 'alerta';
-  return 'ok';
+  if (dias > 30) return 'ok';
+  if (dias > 15) return 'alerta';
+  return 'vencido';
 }
 
 function textoDias(dias) {
@@ -401,45 +550,97 @@ function textoDias(dias) {
   return `Faltam ${dias} dias`;
 }
 
-/* ============ RENDERIZAR ============ */
+function renderCardsCategorias(meus) {
+  document.getElementById('cardsCategorias').innerHTML = CATEGORIAS.map(c => {
+    const total = meus.filter(p => p.categoria === c.nome).length;
+    const ativo = filtroCategoria === c.nome ? ' ativo' : '';
+    return `<div class="card-resumo cat-${c.slug}${ativo}" onclick="filtrarPorCategoria('${c.nome}')">
+      <div class="num">${total}</div>
+      <div class="lbl">${c.nome}</div>
+    </div>`;
+  }).join('');
+}
+
 function renderizar() {
   const lista = document.getElementById('listaProdutos');
   const meus = produtos.filter(p => p.promotor === promotor.nome);
 
-  // contadores
-  document.getElementById('countBW').textContent = meus.filter(p => p.categoria === 'BW').length;
-  document.getElementById('countHC').textContent = meus.filter(p => p.categoria === 'HC').length;
-  document.getElementById('countNT').textContent = meus.filter(p => p.categoria === 'NT').length;
+  renderCardsCategorias(meus);
 
-  if (meus.length === 0) {
-    lista.innerHTML = `
-      <div class="vazio">
-        <div class="emoji">📦</div>
-        <p>Nenhum produto cadastrado ainda.</p>
-        <p style="font-size:13px;margin-top:6px">Toque no botão <b>+</b> para começar</p>
-      </div>`;
+  const barraFiltro = document.getElementById('filtroAtivo');
+  if (filtroCategoria) {
+    barraFiltro.classList.add('visivel');
+    document.getElementById('filtroAtivoTexto').textContent = `Filtrando: ${filtroCategoria}`;
+  } else {
+    barraFiltro.classList.remove('visivel');
+  }
+
+  const filtrados = filtroCategoria ? meus.filter(p => p.categoria === filtroCategoria) : meus;
+
+  if (filtrados.length === 0) {
+    lista.innerHTML = `<div class="vazio">
+      <div class="emoji">📦</div>
+      <p>${filtroCategoria ? `Nenhum produto em ${filtroCategoria}.` : 'Nenhum produto cadastrado ainda.'}</p>
+      <p style="font-size:13px;margin-top:6px">${filtroCategoria ? 'Limpe o filtro ou cadastre um novo.' : 'Toque no botão <b>+</b> para começar'}</p>
+    </div>`;
     return;
   }
 
-  // ordena por validade (mais próximo primeiro)
-  meus.sort((a, b) => new Date(a.validade) - new Date(b.validade));
+  const grupos = CATEGORIAS
+    .map(cat => ({ ...cat, itens: filtrados.filter(p => p.categoria === cat.nome) }))
+    .filter(g => g.itens.length > 0);
 
-  lista.innerHTML = meus.map(p => {
-    const dias = diasRestantes(p.validade);
-    const cls = classeDias(dias);
-    const dataFmt = new Date(p.validade + 'T00:00:00').toLocaleDateString('pt-BR');
-    return `
-      <div class="produto ${cls}">
-        <div class="icone-produto">📦</div>
-        <div class="info">
-          <span class="cat ${p.categoria}">${p.categoria}</span>
-          <div class="nome">${p.nome}</div>
-          <div class="dias ${cls}">${textoDias(dias)}</div>
-          <div class="data">Validade: ${dataFmt}</div>
-        </div>
-        <button class="del" onclick="excluir(${p.id})">✕</button>
-      </div>`;
-  }).join('');
+  grupos.forEach(g => {
+    g.itens.sort((a, b) => {
+      const da = diasRestantes(a.validade);
+      const db = diasRestantes(b.validade);
+      const corA = ORDEM_COR[classeDias(da)];
+      const corB = ORDEM_COR[classeDias(db)];
+      if (corA !== corB) return corA - corB;
+      return da - db;
+    });
+  });
+
+  grupos.sort((a, b) => {
+    const urgA = Math.min(...a.itens.map(p => ORDEM_COR[classeDias(diasRestantes(p.validade))]));
+    const urgB = Math.min(...b.itens.map(p => ORDEM_COR[classeDias(diasRestantes(p.validade))]));
+    if (urgA !== urgB) return urgA - urgB;
+    const minA = Math.min(...a.itens.map(p => diasRestantes(p.validade)));
+    const minB = Math.min(...b.itens.map(p => diasRestantes(p.validade)));
+    return minA - minB;
+  });
+
+  lista.innerHTML = grupos.map(g => `<div class="grupo-categoria">
+    <div class="grupo-categoria-header ${g.slug}">
+      <div class="barra-cor"></div>
+      <h3>${g.nome}</h3>
+      <span class="qtd-badge">${g.itens.length}</span>
+    </div>
+    ${g.itens.map(p => renderProduto(p)).join('')}
+  </div>`).join('');
+}
+
+function renderProduto(p) {
+  const dias = diasRestantes(p.validade);
+  const cls = classeDias(dias);
+  const dataFmt = new Date(p.validade + 'T00:00:00').toLocaleDateString('pt-BR');
+  const qtd = p.quantidade || 1;
+  const marcaGram = [p.marca, p.gramatura].filter(Boolean).join(' • ');
+  return `<div class="produto ${cls}">
+    <div class="icone-produto">📦</div>
+    <div class="info">
+      <div class="nome">${p.nome}</div>
+      ${marcaGram ? `<div class="marca-gram">${marcaGram}</div>` : ''}
+      <div class="dias ${cls}">${textoDias(dias)}</div>
+      <div class="data">Validade: ${dataFmt}</div>
+      <div class="qtd-control">
+        <button onclick="alterarQtd(${p.id}, -1)">−</button>
+        <span class="qtd-val">${qtd}</span>
+        <button onclick="alterarQtd(${p.id}, +1)">+</button>
+      </div>
+    </div>
+    <button class="del" onclick="excluir(${p.id})">✕</button>
+  </div>`;
 }
 
 function excluir(id) {
@@ -450,7 +651,6 @@ function excluir(id) {
   mostrarToast('Produto removido');
 }
 
-/* ============ TOAST ============ */
 function mostrarToast(msg, cor = '#43A047') {
   const t = document.getElementById('toast');
   t.textContent = msg;
@@ -459,8 +659,8 @@ function mostrarToast(msg, cor = '#43A047') {
   setTimeout(() => t.classList.remove('show'), 2500);
 }
 
-/* ============ AUTO LOGIN ============ */
 window.onload = () => {
+  montarCategorias();
   const salvo = localStorage.getItem('univalidade_promotor');
   if (salvo) {
     promotor = JSON.parse(salvo);
