@@ -1,67 +1,544 @@
-window.onload = function() {
-  // Só faz auto-login se houver promotor válido salvo
-  try {
-    var pSalvo = localStorage.getItem('univalidade_promotor');
-    if (pSalvo) {
-      var p = JSON.parse(pSalvo);
-      if (p && p.nome && p.loja && p.cidade) {
-        promotor = p;
-        document.getElementById('inNome').value = p.nome;
-        document.getElementById('inLoja').value = p.loja;
-        document.getElementById('inCidade').value = p.cidade;
-        entrar();
-        return;
-      }
-    }
-  } catch(e) {}
-  // Se não houver promotor válido, garante que a tela de login apareça
-  document.getElementById('telaLogin').classList.add('ativa');
-  document.getElementById('telaDash').classList.remove('ativa');
-  document.getElementById('fab').style.display = 'none';
-  document.getElementById('nav').style.display = 'none';
-};
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Univalidade</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; }
+  body { background: #f3f4f6; color: #111827; min-height: 100vh; }
+  .hidden { display: none !important; }
 
-function entrar() {
-  var nome = document.getElementById('inNome').value.trim();
-  var loja = document.getElementById('inLoja').value.trim();
-  var cidade = document.getElementById('inCidade').value.trim();
+  header {
+    background: #1d4ed8; color: #fff; padding: 12px 16px;
+    display: flex; justify-content: space-between; align-items: center;
+    flex-wrap: wrap; gap: 8px;
+  }
+  header h1 { font-size: 18px; }
+  header nav { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; font-size: 14px; }
+  header nav a, header nav button {
+    color: #fff; background: none; border: none; cursor: pointer;
+    text-decoration: none; font-size: 14px;
+  }
+  header nav a:hover, header nav button:hover { text-decoration: underline; }
+  .btn-novo { background: #fff; color: #1d4ed8; padding: 6px 12px; border-radius: 8px; font-weight: 600; text-decoration: none; }
+  .btn-novo:hover { background: #dbeafe; text-decoration: none; }
 
-  if (!nome || !loja || !cidade) {
-    alert('Preencha todos os campos!');
+  main { max-width: 960px; margin: 0 auto; padding: 16px; }
+  h2 { font-size: 22px; margin-bottom: 4px; }
+  .sub { color: #6b7280; font-size: 14px; margin-bottom: 16px; }
+
+  .card { background: #fff; border-radius: 12px; padding: 16px; border: 1px solid #e5e7eb; margin-bottom: 16px; }
+  .grid-cards { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 16px; }
+  @media (min-width: 700px) { .grid-cards { grid-template-columns: repeat(4, 1fr); } }
+
+  .stat { padding: 16px; border-radius: 12px; border: 1px solid; }
+  .stat p:first-child { font-size: 12px; color: #4b5563; }
+  .stat p:last-child { font-size: 24px; font-weight: 700; }
+  .stat.total { background: #eff6ff; border-color: #bfdbfe; }
+  .stat.vencido { background: #fef2f2; border-color: #fecaca; }
+  .stat.critico { background: #fff7ed; border-color: #fed7aa; }
+  .stat.atencao { background: #fefce8; border-color: #fef08a; }
+
+  input, select, textarea {
+    width: 100%; padding: 10px 12px; border: 1px solid #d1d5db;
+    border-radius: 8px; font-size: 14px; outline: none; background: #fff;
+  }
+  input:focus, select:focus, textarea:focus { border-color: #3b82f6; box-shadow: 0 0 0 2px #bfdbfe; }
+  label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 4px; color: #374151; }
+  .form-group { margin-bottom: 12px; }
+  .row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+  button.primary {
+    width: 100%; background: #1d4ed8; color: #fff; padding: 10px;
+    border: none; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 15px;
+  }
+  button.primary:hover { background: #1e40af; }
+  button.primary:disabled { opacity: 0.6; cursor: not-allowed; }
+
+  .auth-box { max-width: 380px; margin: 60px auto; background: #fff; padding: 24px; border-radius: 16px; border: 1px solid #e5e7eb; }
+  .auth-box h1 { text-align: center; color: #1d4ed8; font-size: 22px; margin-bottom: 4px; }
+  .auth-box .sub { text-align: center; }
+  .auth-box p.link { text-align: center; font-size: 14px; color: #6b7280; margin-top: 12px; }
+  .auth-box p.link a { color: #1d4ed8; text-decoration: none; }
+  .auth-box p.link a:hover { text-decoration: underline; }
+  .erro { color: #dc2626; font-size: 13px; margin-bottom: 8px; }
+
+  .badge {
+    font-size: 11px; padding: 3px 8px; border-radius: 999px;
+    border: 1px solid; font-weight: 600; white-space: nowrap;
+  }
+  .b-ok { background: #dcfce7; color: #166534; border-color: #86efac; }
+  .b-atencao { background: #fef9c3; color: #854d0e; border-color: #fde047; }
+  .b-critico { background: #ffedd5; color: #9a3412; border-color: #fdba74; }
+  .b-vencido { background: #fee2e2; color: #991b1b; border-color: #fca5a5; }
+
+  .cat-tag { font-size: 11px; padding: 3px 8px; border-radius: 6px; border: 1px solid; font-weight: 600; }
+  .cat-BPC { background: #dbeafe; color: #1e40af; border-color: #93c5fd; }
+  .cat-HC { background: #f3e8ff; color: #6b21a8; border-color: #d8b4fe; }
+  .cat-Maionese { background: #fef9c3; color: #854d0e; border-color: #fde047; }
+  .cat-OutrosMols { background: #ffedd5; color: #9a3412; border-color: #fdba74; }
+  .cat-Caldo { background: #fef3c7; color: #92400e; border-color: #fcd34d; }
+  .cat-Tempero { background: #fee2e2; color: #991b1b; border-color: #fca5a5; }
+  .cat-Amido { background: #dcfce7; color: #166534; border-color: #86efac; }
+  .cat-ComplementoAlimentar { background: #fce7f3; color: #9d174d; border-color: #f9a8d4; }
+  .cat-FoodSolution { background: #cffafe; color: #155e75; border-color: #67e8f9; }
+
+  .produto { background: #fff; border: 1px solid #e5e7eb; border-radius: 12px; padding: 14px; margin-bottom: 10px; }
+  .produto-top { display: flex; justify-content: space-between; align-items: start; gap: 10px; margin-bottom: 8px; }
+  .produto-top h3 { font-size: 16px; margin-bottom: 2px; }
+  .produto-top small { color: #6b7280; font-size: 13px; }
+  .produto-info { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; font-size: 12px; color: #6b7280; }
+  .produto-acoes { text-align: right; margin-top: 10px; }
+  .produto-acoes button {
+    background: none; border: none; color: #dc2626; cursor: pointer;
+    font-size: 13px; text-decoration: underline;
+  }
+
+  .filtros { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 16px; }
+  .filtros button {
+    font-size: 12px; padding: 4px 12px; border-radius: 999px;
+    border: 1px solid #d1d5db; background: #fff; cursor: pointer; font-weight: 600;
+  }
+  .filtros button.ativo { background: #1d4ed8; color: #fff; border-color: #1d4ed8; }
+
+  .busca { margin-bottom: 12px; }
+  .lista-produtos { display: grid; gap: 10px; }
+  @media (min-width: 700px) { .lista-produtos { grid-template-columns: 1fr 1fr; } }
+
+  .cat-lista { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 14px; }
+  @media (min-width: 700px) { .cat-lista { grid-template-columns: repeat(3, 1fr); } }
+  .cat-lista div { display: flex; justify-content: space-between; border: 1px solid #e5e7eb; padding: 8px 12px; border-radius: 8px; }
+  .cat-lista strong { font-weight: 700; }
+
+  .vazio { color: #6b7280; font-size: 14px; text-align: center; padding: 20px 0; }
+</style>
+</head>
+<body>
+
+<!-- ================= LOGIN ================= -->
+<section id="tela-login" class="hidden">
+  <div class="auth-box">
+    <h1>Univalidade</h1>
+    <p class="sub">Controle de validade Unilever</p>
+    <form id="form-login">
+      <div class="form-group">
+        <label>Loja</label>
+        <input id="login-loja" required placeholder="Nome da loja" />
+      </div>
+      <div class="form-group">
+        <label>Senha</label>
+        <input id="login-senha" type="password" required />
+      </div>
+      <p class="erro hidden" id="login-erro"></p>
+      <button class="primary" type="submit">Entrar</button>
+      <p class="link">Nova loja? <a href="#" data-tela="cadastro">Cadastre-se</a></p>
+    </form>
+  </div>
+</section>
+
+<!-- ================= CADASTRO ================= -->
+<section id="tela-cadastro" class="hidden">
+  <div class="auth-box">
+    <h1>Nova Loja</h1>
+    <p class="sub">Cadastre seu promotor</p>
+    <form id="form-cadastro">
+      <div class="form-group">
+        <label>Nome do promotor</label>
+        <input id="cad-nome" required />
+      </div>
+      <div class="form-group">
+        <label>Loja</label>
+        <input id="cad-loja" required />
+      </div>
+      <div class="form-group">
+        <label>Cidade</label>
+        <input id="cad-cidade" required />
+      </div>
+      <div class="form-group">
+        <label>Senha</label>
+        <input id="cad-senha" type="password" required />
+      </div>
+      <p class="erro hidden" id="cad-erro"></p>
+      <button class="primary" type="submit">Cadastrar</button>
+      <p class="link">Já tem conta? <a href="#" data-tela="login">Entrar</a></p>
+    </form>
+  </div>
+</section>
+
+<!-- ================= DASHBOARD ================= -->
+<section id="tela-dashboard" class="hidden">
+  <header>
+    <h1>Univalidade</h1>
+    <nav>
+      <a href="#" data-tela="dashboard">Dashboard</a>
+      <a href="#" data-tela="produtos">Produtos</a>
+      <a href="#" class="btn-novo" data-tela="novo">+ Novo</a>
+      <button id="btn-sair">Sair</button>
+    </nav>
+  </header>
+  <main>
+    <h2>Dashboard</h2>
+    <p class="sub" id="dash-info"></p>
+
+    <div class="grid-cards">
+      <div class="stat total"><p>Total</p><p id="stat-total">0</p></div>
+      <div class="stat vencido"><p>Vencidos</p><p id="stat-vencido">0</p></div>
+      <div class="stat critico"><p>≤ 7 dias</p><p id="stat-critico">0</p></div>
+      <div class="stat atencao"><p>8–30 dias</p><p id="stat-atencao">0</p></div>
+    </div>
+
+    <div class="card">
+      <h3 style="margin-bottom:12px;">Produtos por categoria</h3>
+      <div class="cat-lista" id="dash-categorias"></div>
+    </div>
+
+    <div class="card">
+      <h3 style="margin-bottom:12px;">Próximos a vencer</h3>
+      <div id="dash-proximos"></div>
+    </div>
+  </main>
+</section>
+
+<!-- ================= LISTA DE PRODUTOS ================= -->
+<section id="tela-produtos" class="hidden">
+  <header>
+    <h1>Univalidade</h1>
+    <nav>
+      <a href="#" data-tela="dashboard">Dashboard</a>
+      <a href="#" data-tela="produtos">Produtos</a>
+      <a href="#" class="btn-novo" data-tela="novo">+ Novo</a>
+      <button id="btn-sair-2">Sair</button>
+    </nav>
+  </header>
+  <main>
+    <h2>Produtos</h2>
+    <p class="sub">Filtre, busque e gerencie</p>
+
+    <input id="busca" class="busca" placeholder="Buscar por nome ou marca..." />
+    <div class="filtros" id="filtros"></div>
+    <div class="lista-produtos" id="lista-produtos"></div>
+  </main>
+</section>
+
+<!-- ================= NOVO PRODUTO ================= -->
+<section id="tela-novo" class="hidden">
+  <header>
+    <h1>Univalidade</h1>
+    <nav>
+      <a href="#" data-tela="dashboard">Dashboard</a>
+      <a href="#" data-tela="produtos">Produtos</a>
+      <a href="#" class="btn-novo" data-tela="novo">+ Novo</a>
+      <button id="btn-sair-3">Sair</button>
+    </nav>
+  </header>
+  <main style="max-width:640px;">
+    <h2>Novo Produto</h2>
+    <p class="sub">Preencha os dados do item</p>
+    <form id="form-produto" class="card">
+      <div class="form-group">
+        <label>Nome do produto</label>
+        <input id="p-nome" required />
+      </div>
+      <div class="row">
+        <div class="form-group">
+          <label>Marca</label>
+          <input id="p-marca" required />
+        </div>
+        <div class="form-group">
+          <label>Gramatura / Volume</label>
+          <input id="p-gramatura" placeholder="Ex: 500g, 1kg, 900ml" required />
+        </div>
+      </div>
+      <div class="row">
+        <div class="form-group">
+          <label>Quantidade</label>
+          <input id="p-quantidade" type="number" min="1" value="1" required />
+        </div>
+        <div class="form-group">
+          <label>Categoria</label>
+          <select id="p-categoria" required></select>
+        </div>
+      </div>
+      <div class="row">
+        <div class="form-group">
+          <label>Data de validade</label>
+          <input id="p-validade" type="date" required />
+        </div>
+        <div class="form-group">
+          <label>Lote (opcional)</label>
+          <input id="p-lote" />
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Observação (opcional)</label>
+        <textarea id="p-observacao" rows="2"></textarea>
+      </div>
+      <p class="erro hidden" id="prod-erro"></p>
+      <button class="primary" type="submit">Salvar produto</button>
+    </form>
+  </main>
+</section>
+
+<script>
+/* ============ CONFIG ============ */
+const CATEGORIAS = [
+  'BPC','HC','Maionese','Outros Molhos','Caldo',
+  'Tempero','Amido','Complemento Alimentar','Food Solution'
+];
+const LS_PROMOTOR = 'univalidade_promotor';
+const LS_PRODUTOS = 'univalidade_produtos';
+const LS_LOJAS = 'univalidade_lojas';
+
+/* ============ HELPERS ============ */
+const $ = (id) => document.getElementById(id);
+const slug = (s) => s.replace(/\s+/g, '');
+
+function getLojas() { return JSON.parse(localStorage.getItem(LS_LOJAS) || '[]'); }
+function setLojas(l) { localStorage.setItem(LS_LOJAS, JSON.stringify(l)); }
+function getProdutos() { return JSON.parse(localStorage.getItem(LS_PRODUTOS) || '[]'); }
+function setProdutos(p) { localStorage.setItem(LS_PRODUTOS, JSON.stringify(p)); }
+function getPromotor() {
+  const raw = localStorage.getItem(LS_PROMOTOR);
+  return raw ? JSON.parse(raw) : null;
+}
+function setPromotor(p) { localStorage.setItem(LS_PROMOTOR, JSON.stringify(p)); }
+function sair() {
+  localStorage.removeItem(LS_PROMOTOR);
+  mostrarTela('login');
+}
+
+function diasRestantes(dataStr) {
+  const hoje = new Date(); hoje.setHours(0,0,0,0);
+  const d = new Date(dataStr + 'T00:00:00');
+  return Math.ceil((d - hoje) / 86400000);
+}
+function statusValidade(dataStr) {
+  const d = diasRestantes(dataStr);
+  if (d < 0) return 'vencido';
+  if (d <= 7) return 'critico';
+  if (d <= 30) return 'atencao';
+  return 'ok';
+}
+function labelStatus(dataStr) {
+  const s = statusValidade(dataStr);
+  const d = diasRestantes(dataStr);
+  const nomes = { ok: 'OK', atencao: 'Atenção', critico: 'Crítico', vencido: 'Vencido' };
+  return d < 0 ? `${nomes[s]} (${Math.abs(d)}d)` : `${nomes[s]} (${d}d)`;
+}
+function formatarData(s) {
+  return new Date(s + 'T00:00:00').toLocaleDateString('pt-BR');
+}
+
+/* ============ NAVEGAÇÃO ============ */
+function mostrarTela(nome) {
+  const promotor = getPromotor();
+  const precisaLogin = ['dashboard','produtos','novo'].includes(nome);
+  if (precisaLogin && !promotor) nome = 'login';
+
+  document.querySelectorAll('section').forEach(s => s.classList.add('hidden'));
+  $('tela-' + nome).classList.remove('hidden');
+
+  if (nome === 'dashboard') renderDashboard();
+  if (nome === 'produtos') renderProdutos();
+  if (nome === 'novo') resetFormProduto();
+  window.scrollTo(0,0);
+}
+
+document.body.addEventListener('click', (e) => {
+  const alvo = e.target.closest('[data-tela]');
+  if (alvo) {
+    e.preventDefault();
+    mostrarTela(alvo.dataset.tela);
+  }
+});
+['btn-sair','btn-sair-2','btn-sair-3'].forEach(id => {
+  const el = $(id); if (el) el.addEventListener('click', sair);
+});
+
+/* ============ LOGIN ============ */
+$('form-login').addEventListener('submit', (e) => {
+  e.preventDefault();
+  const loja = $('login-loja').value.trim().toLowerCase();
+  const senha = $('login-senha').value;
+  const erro = $('login-erro');
+  erro.classList.add('hidden');
+
+  const encontrado = getLojas().find(l => l.loja.toLowerCase() === loja && l.senha === senha);
+  if (!encontrado) {
+    erro.textContent = 'Loja ou senha inválidos.';
+    erro.classList.remove('hidden');
+    return;
+  }
+  setPromotor({ nome: encontrado.nome, loja: encontrado.loja, cidade: encontrado.cidade });
+  mostrarTela('dashboard');
+});
+
+/* ============ CADASTRO ============ */
+$('form-cadastro').addEventListener('submit', (e) => {
+  e.preventDefault();
+  const erro = $('cad-erro');
+  erro.classList.add('hidden');
+
+  const novo = {
+    nome: $('cad-nome').value.trim(),
+    loja: $('cad-loja').value.trim(),
+    cidade: $('cad-cidade').value.trim(),
+    senha: $('cad-senha').value,
+  };
+  const lojas = getLojas();
+  if (lojas.some(l => l.loja.toLowerCase() === novo.loja.toLowerCase())) {
+    erro.textContent = 'Essa loja já está cadastrada.';
+    erro.classList.remove('hidden');
+    return;
+  }
+  lojas.push(novo);
+  setLojas(lojas);
+  setPromotor({ nome: novo.nome, loja: novo.loja, cidade: novo.cidade });
+  mostrarTela('dashboard');
+});
+
+/* ============ DASHBOARD ============ */
+function renderDashboard() {
+  const promotor = getPromotor();
+  $('dash-info').textContent = `${promotor.nome} • ${promotor.loja} — ${promotor.cidade}`;
+
+  const produtos = getProdutos().filter(p => p.loja === promotor.loja);
+  const ordenados = [...produtos].sort((a,b) => a.data_validade.localeCompare(b.data_validade));
+
+  const vencidos = ordenados.filter(p => diasRestantes(p.data_validade) < 0);
+  const criticos = ordenados.filter(p => { const d = diasRestantes(p.data_validade); return d >= 0 && d <= 7; });
+  const atencao = ordenados.filter(p => { const d = diasRestantes(p.data_validade); return d > 7 && d <= 30; });
+
+  $('stat-total').textContent = ordenados.length;
+  $('stat-vencido').textContent = vencidos.length;
+  $('stat-critico').textContent = criticos.length;
+  $('stat-atencao').textContent = atencao.length;
+
+  $('dash-categorias').innerHTML = CATEGORIAS.map(c => {
+    const total = ordenados.filter(p => p.categoria === c).length;
+    return `<div><span>${c}</span><strong>${total}</strong></div>`;
+  }).join('');
+
+  $('dash-proximos').innerHTML = ordenados.length === 0
+    ? '<p class="vazio">Nenhum produto cadastrado.</p>'
+    : ordenados.slice(0,8).map(p => `
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid #f3f4f6;">
+        <div>
+          <p style="font-weight:600;font-size:14px;">${p.nome}</p>
+          <p style="font-size:12px;color:#6b7280;">${p.categoria}</p>
+        </div>
+        <span class="badge b-${statusValidade(p.data_validade)}">${labelStatus(p.data_validade)}</span>
+      </div>
+    `).join('');
+}
+
+/* ============ LISTA DE PRODUTOS ============ */
+let filtroAtual = 'Todas';
+
+function renderFiltros() {
+  const filtros = $('filtros');
+  const opcoes = ['Todas', ...CATEGORIAS];
+  filtros.innerHTML = opcoes.map(c => `
+    <button data-cat="${c}" class="${c === filtroAtual ? 'ativo' : ''}">${c}</button>
+  `).join('');
+  filtros.querySelectorAll('button').forEach(b => {
+    b.addEventListener('click', () => {
+      filtroAtual = b.dataset.cat;
+      renderProdutos();
+    });
+  });
+}
+
+function renderProdutos() {
+  const promotor = getPromotor();
+  if (!promotor) return;
+  renderFiltros();
+
+  const busca = ($('busca').value || '').toLowerCase();
+  const lista = getProdutos()
+    .filter(p => p.loja === promotor.loja)
+    .filter(p => filtroAtual === 'Todas' || p.categoria === filtroAtual)
+    .filter(p => !busca || p.nome.toLowerCase().includes(busca) || p.marca.toLowerCase().includes(busca))
+    .sort((a,b) => a.data_validade.localeCompare(b.data_validade));
+
+  const container = $('lista-produtos');
+  if (lista.length === 0) {
+    container.innerHTML = '<p class="vazio">Nenhum produto encontrado.</p>';
     return;
   }
 
-  // Reset de estado interno antes de montar a tela
-  promotor = { nome: nome, loja: loja, cidade: cidade };
-  localStorage.setItem('univalidade_promotor', JSON.stringify(promotor));
+  container.innerHTML = lista.map(p => `
+    <div class="produto">
+      <div class="produto-top">
+        <div>
+          <h3>${p.nome}</h3>
+          <small>${p.marca} • ${p.gramatura} • Qtd: ${p.quantidade}</small>
+        </div>
+        <span class="badge b-${statusValidade(p.data_validade)}">${labelStatus(p.data_validade)}</span>
+      </div>
+      <div class="produto-info">
+        <span class="cat-tag cat-${slug(p.categoria)}">${p.categoria}</span>
+        <span>Validade: ${formatarData(p.data_validade)}</span>
+        ${p.lote ? `<span>Lote: ${p.lote}</span>` : ''}
+      </div>
+      ${p.observacao ? `<p style="font-size:13px;color:#4b5563;font-style:italic;margin-top:6px;">"${p.observacao}"</p>` : ''}
+      <div class="produto-acoes">
+        <button data-excluir="${p.id}">Excluir</button>
+      </div>
+    </div>
+  `).join('');
 
-  document.getElementById('saudNome').textContent = nome.split(' ')[0];
-  document.getElementById('saudLoja').textContent = loja + ' • ' + cidade;
-
-  document.getElementById('telaLogin').classList.remove('ativa');
-  document.getElementById('telaDash').classList.add('ativa');
-  document.getElementById('fab').style.display = 'flex';
-  document.getElementById('nav').style.display = 'flex';
-
-  renderizar();
+  container.querySelectorAll('[data-excluir]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const id = btn.dataset.excluir;
+      if (!confirm('Excluir este produto?')) return;
+      setProdutos(getProdutos().filter(p => p.id !== id));
+      renderProdutos();
+    });
+  });
 }
 
-function sair() {
-  // Limpa tudo antes de recarregar
-  try {
-    localStorage.removeItem('univalidade_promotor');
-  } catch(e) {}
-  promotor = null;
-  produtos = [];
-  categoriaSelecionada = null;
-  produtoDetalheId = null;
+$('busca').addEventListener('input', renderProdutos);
 
-  // Fecha modais abertos, se houver
-  var modalBg = document.getElementById('modalBg');
-  var modalDetalheBg = document.getElementById('modalDetalheBg');
-  if (modalBg) modalBg.classList.remove('aberto');
-  if (modalDetalheBg) modalDetalheBg.classList.remove('aberto');
+/* ============ NOVO PRODUTO ============ */
+function resetFormProduto() {
+  $('form-produto').reset();
+  $('p-quantidade').value = 1;
+  $('prod-erro').classList.add('hidden');
 
-  // Recarrega com parâmetro para evitar cache do bfcache
-  location.replace(location.pathname + '?logout=' + Date.now());
+  const sel = $('p-categoria');
+  if (sel.options.length === 0) {
+    sel.innerHTML = CATEGORIAS.map(c => `<option value="${c}">${c}</option>`).join('');
+  }
 }
+
+$('form-produto').addEventListener('submit', (e) => {
+  e.preventDefault();
+  const promotor = getPromotor();
+  if (!promotor) return;
+
+  const novo = {
+    id: crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(),
+    loja: promotor.loja,
+    nome: $('p-nome').value.trim(),
+    marca: $('p-marca').value.trim(),
+    gramatura: $('p-gramatura').value.trim(),
+    quantidade: Number($('p-quantidade').value),
+    categoria: $('p-categoria').value,
+    data_validade: $('p-validade').value,
+    lote: $('p-lote').value.trim() || null,
+    observacao: $('p-observacao').value.trim() || null,
+  };
+
+  const todos = getProdutos();
+  todos.push(novo);
+  setProdutos(todos);
+  mostrarTela('produtos');
+});
+
+/* ============ BOOT ============ */
+mostrarTela(getPromotor() ? 'dashboard' : 'login');
+</script>
+</body>
+</html>
